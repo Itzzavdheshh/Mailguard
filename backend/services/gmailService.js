@@ -268,11 +268,70 @@ const getGmailAddress = async (user) => {
   }
 };
 
+/**
+ * Delete an email from Gmail
+ * @param {string} gmailId - Gmail message ID to delete
+ * @param {string} accessToken - User's Gmail access token
+ * @param {string} refreshToken - User's Gmail refresh token
+ * @returns {Promise<Object>} Deletion result
+ */
+const deleteEmail = async (gmailId, accessToken, refreshToken) => {
+  try {
+    // Validate inputs
+    if (!gmailId) {
+      throw new Error('Gmail message ID is required for deletion');
+    }
+
+    if (!accessToken) {
+      throw new Error('User has not connected Gmail. Access token is required.');
+    }
+
+    console.log(`🗑️  Attempting to delete Gmail message: ${gmailId}`);
+
+    // Create authenticated Gmail client
+    const gmail = getGmailClient(accessToken, refreshToken);
+
+    // Delete the email using Gmail API
+    // Note: This permanently deletes the email (not just trash)
+    await gmail.users.messages.delete({
+      userId: 'me',
+      id: gmailId,
+    });
+
+    console.log(`✅ Successfully deleted Gmail message: ${gmailId}`);
+
+    return {
+      success: true,
+      gmailId: gmailId,
+      message: 'Email deleted successfully from Gmail',
+    };
+
+  } catch (error) {
+    console.error(`❌ Error deleting Gmail message ${gmailId}:`, error.message);
+
+    // Handle specific Gmail API errors
+    if (error.code === 401) {
+      throw new Error('Gmail authentication failed. Token may be expired. Please reconnect Gmail.');
+    }
+
+    if (error.code === 404) {
+      throw new Error('Email not found in Gmail. It may have already been deleted.');
+    }
+
+    if (error.code === 403) {
+      throw new Error('Permission denied. Unable to delete email from Gmail.');
+    }
+
+    throw new Error(`Failed to delete email from Gmail: ${error.message}`);
+  }
+};
+
 // Export service functions
 module.exports = {
   fetchEmails,
   parseGmailMessage,
   getGmailAddress,
   extractEmail,
-  extractName
+  extractName,
+  deleteEmail, // New function added
 };

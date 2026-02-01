@@ -31,6 +31,7 @@ app.use(cors());
 // Import route modules
 const authRoutes = require('./routes/authRoutes');
 const gmailRoutes = require('./routes/gmailRoutes');
+const emailRoutes = require('./routes/emailRoutes');
 
 // Test route - verifies server is running
 app.get('/', (req, res) => {
@@ -45,6 +46,9 @@ app.use('/api/auth', authRoutes);
 
 // Mount Gmail OAuth routes
 app.use('/api/gmail', gmailRoutes);
+
+// Mount email classification routes
+app.use('/api/emails', emailRoutes);
 
 // ================================================
 // SERVER STARTUP

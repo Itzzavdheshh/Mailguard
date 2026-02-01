@@ -1,31 +1,40 @@
-# Dependencies
-node_modules/
+# ================================================
+# MAILGUARD PROJECT - GITIGNORE
+# Production-ready ignore patterns
+# ================================================
 
-# Environment variables
+# ================================
+# DEPENDENCIES
+# ================================
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ================================
+# ENVIRONMENT VARIABLES
+# ================================
 .env
 .env.local
+.env.development
+.env.test
 .env.production
+.env.*.local
 
-# Logs
-logs
+# ================================
+# LOGS
+# ================================
+logs/
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Build files
-dist/
-build/
-
-# Python
+# ================================
+# PYTHON
+# ================================
 __pycache__/
 *.py[cod]
 *$py.class
@@ -33,9 +42,122 @@ __pycache__/
 .Python
 env/
 venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
 
-# ML Training Files
+# ================================
+# ML SERVICE ARTIFACTS
+# ================================
+# Training datasets (keep samples only)
 ml-service/training.csv
 ml-service/training_*.csv
+ml-service/emails.csv
+ml-service/classified_emails.csv
+ml-service/dataset_*.csv
+
+# Models (too large for git)
 ml-service/phishing_model.pkl
 ml-service/vectorizer.pkl
+ml-service/model_*.pkl
+ml-service/*.h5
+ml-service/*.pt
+
+# Jupyter Notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# ================================
+# FRONTEND BUILD
+# ================================
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/.next/
+frontend/out/
+
+# ================================
+# BACKEND
+# ================================
+backend/dist/
+backend/build/
+
+# ================================
+# DATABASE
+# ================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ================================
+# OS FILES
+# ================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ================================
+# IDE / EDITORS
+# ================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ================================
+# TEMPORARY FILES
+# ================================
+*.tmp
+*.temp
+*.bak
+*.cache
+.cache/
+tmp/
+temp/
+
+# ================================
+# TEST COVERAGE
+# ================================
+coverage/
+.nyc_output/
+
+# ================================
+# DOCUMENTATION (generated)
+# ================================
+docs/_build/
+site/
+
+# ================================
+# DOCKER (for future use)
+# ================================
+.dockerignore
+
+# ================================
+# MISCELLANEOUS
+# ================================
+*.csv
+*.xlsx
+*.xls
+!ml-service/sample_training.csv
+credentials.yml
+credentials.json
+token.json
+.credentials/

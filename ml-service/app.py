@@ -3,6 +3,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import predictor  # Import predictor to load models at startup
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -36,8 +37,10 @@ async def root():
     Root endpoint with service information
     Returns: Service name and version
     """
+    model_status = predictor.get_model_status()
     return {
         "service": "Phishing Detection ML Service",
         "version": "1.0.0",
-        "status": "running"
+        "status": "running",
+        "model_loaded": model_status["loaded"]
     }

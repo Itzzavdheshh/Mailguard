@@ -32,6 +32,7 @@ app.use(cors());
 const authRoutes = require('./routes/authRoutes');
 const gmailRoutes = require('./routes/gmailRoutes');
 const emailRoutes = require('./routes/emailRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 // Test route - verifies server is running
 app.get('/', (req, res) => {
@@ -49,6 +50,9 @@ app.use('/api/gmail', gmailRoutes);
 
 // Mount email classification routes
 app.use('/api/emails', emailRoutes);
+
+// Mount feedback routes
+app.use('/api/feedback', feedbackRoutes);
 
 // ================================================
 // SERVER STARTUP

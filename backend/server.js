@@ -33,6 +33,7 @@ const authRoutes = require('./routes/authRoutes');
 const gmailRoutes = require('./routes/gmailRoutes');
 const emailRoutes = require('./routes/emailRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 // Test route - verifies server is running
 app.get('/', (req, res) => {
@@ -53,6 +54,9 @@ app.use('/api/emails', emailRoutes);
 
 // Mount feedback routes
 app.use('/api/feedback', feedbackRoutes);
+
+// Mount admin routes
+app.use('/api/admin', adminRoutes);
 
 // ================================================
 // SERVER STARTUP

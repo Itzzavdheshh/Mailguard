@@ -26,6 +26,9 @@ function Dashboard() {
   // Emails state
   const [emails, setEmails] = useState([])
   const [emailsLoading, setEmailsLoading] = useState(true)
+  
+  // Multi-select state
+  const [selectedEmails, setSelectedEmails] = useState([])
 
   // Fetch stats and emails on component mount
   useEffect(() => {
@@ -120,6 +123,31 @@ function Dashboard() {
     } catch (err) {
       console.error('❌ Failed to submit feedback:', err)
       alert('Failed to submit feedback. Please try again.')
+    }
+  }
+  
+  // Handle selecting/deselecting a single email
+  const handleSelectEmail = (emailId) => {
+    setSelectedEmails(prev => {
+      if (prev.includes(emailId)) {
+        // Deselect
+        return prev.filter(id => id !== emailId)
+      } else {
+        // Select
+        return [...prev, emailId]
+      }
+    })
+  }
+  
+  // Handle select all / deselect all
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      // Select all email IDs
+      const allEmailIds = emails.map(email => email._id)
+      setSelectedEmails(allEmailIds)
+    } else {
+      // Deselect all
+      setSelectedEmails([])
     }
   }
 
@@ -249,6 +277,9 @@ function Dashboard() {
           loading={emailsLoading}
           onDelete={handleDelete}
           onFeedback={handleFeedback}
+          selectedEmails={selectedEmails}
+          onSelectEmail={handleSelectEmail}
+          onSelectAll={handleSelectAll}
         />
 
         {/* Footer Note */}

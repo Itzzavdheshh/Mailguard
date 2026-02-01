@@ -1,11 +1,12 @@
 /**
  * EMAIL TABLE COMPONENT
  * Displays list of emails with predictions
+ * Supports multi-select for bulk operations
  */
 
 import { useState } from 'react'
 
-function EmailTable({ emails, onDelete, onFeedback, loading }) {
+function EmailTable({ emails, onDelete, onFeedback, loading, selectedEmails, onSelectEmail, onSelectAll }) {
   // Show loading state
   if (loading) {
     return (
@@ -52,6 +53,11 @@ function EmailTable({ emails, onDelete, onFeedback, loading }) {
       {/* Table Header */}
       <div className="bg-gray-800/50 border-b border-gray-700 px-6 py-4">
         <h2 className="text-lg font-semibold text-white">Email List</h2>
+        {selectedEmails.length > 0 && (
+          <p className="text-sm text-gray-400 mt-1">
+            {selectedEmails.length} email{selectedEmails.length !== 1 ? 's' : ''} selected
+          </p>
+        )}
       </div>
 
       {/* Table Content */}
@@ -59,6 +65,16 @@ function EmailTable({ emails, onDelete, onFeedback, loading }) {
         <table className="w-full">
           <thead className="bg-gray-800/30 border-b border-gray-700">
             <tr>
+              <th className="px-6 py-3 text-left">
+                {/* Select All Checkbox */}
+                <input
+                  type="checkbox"
+                  checked={selectedEmails.length === emails.length && emails.length > 0}
+                  onChange={(e) => onSelectAll(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                  title="Select all emails"
+                />
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 Subject
               </th>
@@ -83,6 +99,8 @@ function EmailTable({ emails, onDelete, onFeedback, loading }) {
                 email={email}
                 onDelete={onDelete}
                 onFeedback={onFeedback}
+                isSelected={selectedEmails.includes(email._id)}
+                onSelect={onSelectEmail}
               />
             ))}
           </tbody>
@@ -93,7 +111,7 @@ function EmailTable({ emails, onDelete, onFeedback, loading }) {
 }
 
 // Individual Email Row Component
-function EmailRow({ email, onDelete, onFeedback }) {
+function EmailRow({ email, onDelete, onFeedback, isSelected, onSelect }) {
   const [showActions, setShowActions] = useState(false)
 
   // Get prediction label and color
@@ -140,7 +158,19 @@ function EmailRow({ email, onDelete, onFeedback }) {
   }
 
   return (
-    <tr className="hover:bg-gray-800/30 transition duration-150">
+    <tr className={`hover:bg-gray-800/30 transition duration-150 ${isSelected ? 'bg-blue-900/20' : ''}`}>
+      {/* Checkbox Column */}
+      <td className="px-6 py-4">
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={(e) => {
+            e.stopPropagation()
+            onSelect(email._id)
+          }}
+          className="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+        />
+      </td>
       <td className="px-6 py-4">
         <div className="text-sm font-medium text-white">
           {truncate(email.subject)}

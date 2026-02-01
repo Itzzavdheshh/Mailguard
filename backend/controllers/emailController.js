@@ -372,3 +372,141 @@ exports.bulkDeleteEmails = async (req, res) => {
     });
   }
 };
+
+/**
+ * Auto clean all phishing emails
+ * POST /api/emails/clean-phishing
+ * Finds all emails classified as phishing and deletes them
+ */
+exports.cleanPhishingEmails = async (req, res) => {
+  try {
+    const userId = req.user.id; // From auth middleware
+
+    console.log(`🧹 Auto-clean phishing emails request by user: ${userId}`);
+
+    // Step 1: Find all phishing classifications for user's emails
+    const userEmails = await Email.find({ userId: userId }).select('_id');
+    const userEmailIds = userEmails.map(e => e._id);
+
+    // Find all phishing classifications
+    const phishingClassifications = await Classification.find({
+      emailId: { $in: userEmailIds },
+      prediction: 'phishing'
+    });
+
+    if (phishingClassifications.length === 0) {
+      return res.json({
+        success: true,
+        message: 'No phishing emails found to clean',
+        results: {
+          total: 0,
+          deleted: 0,
+          failed: 0
+        }
+      });
+    }
+
+    console.log(`🎯 Found ${phishingClassifications.length} phishing emails to delete`);
+
+    // Step 2: Get user's Gmail tokens
+    const user = await User.findById(userId);
+
+    if (!user || !user.gmailAccessToken) {
+      return res.status(400).json({
+        success: false,
+        error: 'Gmail not connected. Cannot delete emails from Gmail.'
+      });
+    }
+
+    // Step 3: Extract email IDs from classifications
+    const phishingEmailIds = phishingClassifications.map(c => c.emailId);
+
+    // Step 4: Find all phishing emails
+    const phishingEmails = await Email.find({
+      _id: { $in: phishingEmailIds },
+      userId: userId
+    });
+
+    // Step 5: Delete each phishing email
+    const results = {
+      total: phishingEmails.length,
+      deleted: 0,
+      failed: 0,
+      gmailErrors: 0,
+      storageSaved: 0, // Approximate storage in bytes
+      deletedEmails: []
+    };
+
+    for (const email of phishingEmails) {
+      try {
+        // Delete from Gmail
+        try {
+          await deleteGmailEmail(
+            email.gmailId,
+            user.gmailAccessToken,
+            user.gmailRefreshToken
+          );
+          console.log(`✅ Gmail deleted: ${email.gmailId}`);
+        } catch (gmailError) {
+          console.error(`⚠️  Gmail deletion failed for ${email.gmailId}: ${gmailError.message}`);
+          results.gmailErrors++;
+        }
+
+        // Estimate storage saved (rough estimate: subject + body length)
+        const emailSize = (email.subject?.length || 0) + (email.body?.length || 0);
+        results.storageSaved += emailSize;
+
+        // Delete classification
+        await Classification.deleteOne({ emailId: email._id });
+
+        // Delete from database
+        await Email.deleteOne({ _id: email._id });
+
+        results.deleted++;
+        results.deletedEmails.push({
+          id: email._id,
+          subject: email.subject,
+          sender: email.sender
+        });
+
+        console.log(`✅ Phishing email deleted: ${email.subject}`);
+
+      } catch (error) {
+        console.error(`❌ Failed to delete phishing email ${email._id}:`, error.message);
+        results.failed++;
+      }
+    }
+
+    // Convert bytes to KB/MB for display
+    const storageSavedKB = (results.storageSaved / 1024).toFixed(2);
+    const storageSavedMB = (results.storageSaved / (1024 * 1024)).toFixed(2);
+
+    console.log(`✅ Clean phishing complete: ${results.deleted} deleted, ${results.failed} failed`);
+    console.log(`💾 Approximate storage saved: ${storageSavedMB} MB`);
+
+    // Step 6: Return results
+    res.json({
+      success: true,
+      message: `Successfully cleaned ${results.deleted} phishing emails`,
+      results: {
+        total: results.total,
+        deleted: results.deleted,
+        failed: results.failed,
+        gmailErrors: results.gmailErrors,
+        storageSaved: {
+          bytes: results.storageSaved,
+          kb: storageSavedKB,
+          mb: storageSavedMB
+        },
+        deletedEmails: results.deletedEmails
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Clean phishing emails error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+};

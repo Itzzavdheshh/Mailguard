@@ -24,4 +24,7 @@ router.delete('/:id', emailController.deleteEmail);
 // Bulk delete multiple emails
 router.post('/bulk-delete', emailController.bulkDeleteEmails);
 
+// Auto clean all phishing emails
+router.post('/clean-phishing', emailController.cleanPhishingEmails);
+
 module.exports = router;

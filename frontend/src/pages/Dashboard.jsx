@@ -5,7 +5,8 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { getEmailStats } from '../services/api'
+import { getEmailStats, getEmails, deleteEmail, submitFeedback } from '../services/api'
+import EmailTable from '../components/EmailTable'
 
 function Dashboard() {
   const { user, logout } = useAuth()
@@ -17,17 +18,22 @@ function Dashboard() {
     phishing: 0,
     safe: 0
   })
-  const [loading, setLoading] = useState(true)
+  const [statsLoading, setStatsLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // Fetch stats on component mount
+  // Emails state
+  const [emails, setEmails] = useState([])
+  const [emailsLoading, setEmailsLoading] = useState(true)
+
+  // Fetch stats and emails on component mount
   useEffect(() => {
     fetchStats()
+    fetchEmails()
   }, [])
 
   const fetchStats = async () => {
     try {
-      setLoading(true)
+      setStatsLoading(true)
       setError('')
       const response = await getEmailStats()
       
@@ -42,9 +48,76 @@ function Dashboard() {
     } catch (err) {
       console.error('❌ Failed to load stats:', err)
       setError('Failed to load statistics')
-      // Keep default values on error
     } finally {
-      setLoading(false)
+      setStatsLoading(false)
+    }
+  }
+
+  const fetchEmails = async () => {
+    try {
+      setEmailsLoading(true)
+      const response = await getEmails()
+      
+      // Handle different response formats
+      const emailList = response.emails || response.data || response || []
+      setEmails(emailList)
+      
+      console.log('✅ Emails loaded:', emailList.length, 'emails')
+    } catch (err) {
+      console.error('❌ Failed to load emails:', err)
+      setEmails([])
+    } finally {
+      setEmailsLoading(false)
+    }
+  }
+
+  const handleDelete = async (emailId) => {
+    if (!window.confirm('Are you sure you want to delete this email?')) {
+      return
+    }
+
+    try {
+      await deleteEmail(emailId)
+      console.log('✅ Email deleted:', emailId)
+      
+      // Refresh emails and stats
+      fetchEmails()
+      fetchStats()
+    } catch (err) {
+      console.error('❌ Failed to delete email:', err)
+      alert('Failed to delete email. Please try again.')
+    }
+  }
+
+  const handleFeedback = async (emailId, type) => {
+    try {
+      // Find the email
+      const email = emails.find(e => e._id === emailId)
+      if (!email) return
+
+      // Determine correct label based on feedback type
+      let correctLabel
+      if (type === 'correct') {
+        // Current prediction is correct, keep it
+        correctLabel = email.prediction
+      } else {
+        // Wrong prediction, flip it
+        correctLabel = email.prediction?.toLowerCase() === 'phishing' ? 'legitimate' : 'phishing'
+      }
+
+      await submitFeedback({
+        emailId,
+        correctLabel: correctLabel.toLowerCase()
+      })
+
+      console.log('✅ Feedback submitted:', { emailId, correctLabel })
+      alert('Thank you for your feedback! This helps improve our AI.')
+      
+      // Optionally refresh emails
+      fetchEmails()
+    } catch (err) {
+      console.error('❌ Failed to submit feedback:', err)
+      alert('Failed to submit feedback. Please try again.')
     }
   }
 
@@ -107,7 +180,7 @@ function Dashboard() {
                 </svg>
               </div>
             </div>
-            {loading ? (
+          {statsLoading ? (
               <div className="animate-pulse">
                 <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
                 <div className="h-4 bg-gray-200 rounded w-24"></div>
@@ -129,7 +202,7 @@ function Dashboard() {
                 </svg>
               </div>
             </div>
-            {loading ? (
+            {statsLoading ? (
               <div className="animate-pulse">
                 <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
                 <div className="h-4 bg-gray-200 rounded w-24"></div>
@@ -151,7 +224,7 @@ function Dashboard() {
                 </svg>
               </div>
             </div>
-            {loading ? (
+            {statsLoading ? (
               <div className="animate-pulse">
                 <div className="h-8 bg-gray-200 rounded w-16 mb-2"></div>
                 <div className="h-4 bg-gray-200 rounded w-24"></div>
@@ -172,23 +245,13 @@ function Dashboard() {
           </div>
         )}
 
-        {/* Empty State */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12">
-          <div className="text-center">
-            <div className="inline-block p-4 bg-gray-100 rounded-full mb-4">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">No emails yet</h3>
-            <p className="text-gray-600 mb-6">
-              Connect your email account to start detecting phishing emails
-            </p>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition duration-200">
-              Connect Email Account
-            </button>
-          </div>
-        </div>
+        {/* Email List */}
+        <EmailTable
+          emails={emails}
+          loading={emailsLoading}
+          onDelete={handleDelete}
+          onFeedback={handleFeedback}
+        />
 
         {/* Footer Note */}
         <div className="mt-8 text-center">

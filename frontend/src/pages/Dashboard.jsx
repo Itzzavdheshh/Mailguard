@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { getEmailStats, getEmails, deleteEmail, submitFeedback } from '../services/api'
 import EmailTable from '../components/EmailTable'
+import EmailStatsChart from '../components/EmailStatsChart'
 
 function Dashboard() {
   const { user, logout } = useAuth()
@@ -244,6 +245,9 @@ function Dashboard() {
             <p className="text-red-600 text-sm">{error}</p>
           </div>
         )}
+
+        {/* Analytics Chart */}
+        <EmailStatsChart stats={stats} loading={statsLoading} />
 
         {/* Email List */}
         <EmailTable

@@ -28,11 +28,11 @@ createRoot(document.getElementById('root')).render(
           colorInputText: '#f3f4f6',
           colorText: '#f3f4f6',
           colorTextSecondary: '#9ca3af',
-          borderRadius: '0.75rem',
+          borderRadius: '0rem',
         },
         elements: {
           rootBox: 'bg-black',
-          card: 'bg-gray-900/80 backdrop-blur-xl border border-gray-800 shadow-2xl rounded-xl',
+          card: 'bg-gray-900/80 backdrop-blur-xl border border-gray-800 shadow-2xl rounded-none',
           cardBox: 'shadow-none',
           headerTitle: 'text-white font-bold',
           headerSubtitle: 'text-gray-400',

@@ -12,7 +12,14 @@ body {
   background-color: #000000;
 }
 
-/* Force remove ALL decorative elements and corners */
+/* Force remove ALL decorative corner elements */
+.cl-card,
+.cl-cardBox,
+.cl-card *,
+.cl-cardBox * {
+  border-radius: 0 !important;
+}
+
 .cl-card::before,
 .cl-card::after,
 .cl-cardBox::before,
@@ -20,11 +27,15 @@ body {
 .cl-internal-b3fm6y::before,
 .cl-internal-b3fm6y::after,
 [class*="cl-internal"]::before,
-[class*="cl-internal"]::after {
+[class*="cl-internal"]::after,
+[class*="cl-"]::before,
+[class*="cl-"]::after {
   content: none !important;
   display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* Force white text for Google button */

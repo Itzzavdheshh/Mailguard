@@ -4,17 +4,18 @@ const mongoose = require('mongoose');
 /**
  * User Schema Definition
  * Defines the structure of user documents in MongoDB
+ * Now uses Clerk for authentication
  */
 const userSchema = new mongoose.Schema(
   {
-    // User's full name
-    name: {
+    // Clerk User ID (primary identifier from Clerk authentication)
+    clerkId: {
       type: String,
-      required: [true, 'Name is required'],
-      trim: true, // Removes whitespace from both ends
+      required: [true, 'Clerk ID is required'],
+      unique: true,
     },
 
-    // User's email address
+    // User's email address (synced from Clerk)
     email: {
       type: String,
       required: [true, 'Email is required'],
@@ -27,10 +28,10 @@ const userSchema = new mongoose.Schema(
       ], // Email validation regex
     },
 
-    // Hashed password (never store plain text passwords)
-    passwordHash: {
+    // User's full name (synced from Clerk)
+    name: {
       type: String,
-      required: [true, 'Password is required'],
+      trim: true, // Removes whitespace from both ends
     },
 
     // ================================================

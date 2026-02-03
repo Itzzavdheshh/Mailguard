@@ -1,10 +1,10 @@
-// Import jsonwebtoken for token verification
-const jwt = require('jsonwebtoken');
+// Import Clerk SDK for authentication
+const { clerkClient } = require('@clerk/clerk-sdk-node');
 
 /**
- * JWT AUTHENTICATION MIDDLEWARE
- * Protects routes by verifying JWT token
- * Attaches userId to request object for use in protected routes
+ * CLERK AUTHENTICATION MIDDLEWARE
+ * Protects routes by verifying Clerk session token
+ * Attaches userId (Clerk user ID) to request object for use in protected routes
  * 
  * Usage: Add this middleware to any route that requires authentication
  * Example: router.get('/profile', authMiddleware, getProfile);
@@ -42,39 +42,27 @@ const authMiddleware = async (req, res, next) => {
       });
     }
 
-    // Verify and decode the JWT token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Verify the Clerk session token
+    const sessionClaims = await clerkClient.verifyToken(token, {
+      secretKey: process.env.CLERK_SECRET_KEY
+    });
 
-    // Attach userId to request object
+    // Attach Clerk userId to request object
     // This makes the userId available in all protected route handlers
-    req.userId = decoded.userId;
+    req.userId = sessionClaims.sub;
 
     // Call next middleware or route handler
     next();
   } catch (error) {
-    // Handle invalid or expired tokens
-    if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid token. Authentication failed.',
-      });
-    }
-
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({
-        success: false,
-        message: 'Token has expired. Please login again.',
-      });
-    }
-
-    // Handle any other errors
-    console.error('Auth middleware error:', error);
-    return res.status(500).json({
+    // Handle Clerk token verification errors
+    console.error('Clerk auth middleware error:', error);
+    return res.status(401).json({
       success: false,
-      message: 'Server error during authentication.',
+      message: 'Invalid or expired token. Please login again.',
     });
   }
 };
 
 // Export the middleware
+module.exports = authMiddleware;
 module.exports = authMiddleware;

@@ -2,11 +2,24 @@ Here’s a `README.md` file template that explains your project, the steps invol
 
 ---
 
+> **🔐 IMPORTANT: Authentication Update**
+> 
+> Mailguard now uses **Clerk** for authentication instead of custom JWT tokens!
+> 
+> For setup instructions, see:
+> - **[CLERK_INTEGRATION.md](./CLERK_INTEGRATION.md)** - Complete Clerk setup guide
+> - **[CLERK_MIGRATION_COMPLETE.md](./CLERK_MIGRATION_COMPLETE.md)** - Migration summary
+>
+> You'll need to create a Clerk account and configure environment variables before running the app.
+
+---
+
 # Mailguard
 
 Mailguard is a Python-based tool that extracts emails from a specified Gmail account and analyzes them to classify emails as **phishing** or **legitimate** using a pre-trained machine learning model.
 
 ## Features
+- **🔐 Clerk Authentication**: Secure, modern authentication with MFA and social login support
 - **Email Extraction**: Connects to a Gmail account using IMAP to fetch emails based on specific search criteria.
 - **Email Analysis**: Analyzes extracted emails for phishing content using a machine learning model.
 - **Frontend Interface**: A Flask-based web application that allows users to input credentials, extract emails, and view results in a structured table.

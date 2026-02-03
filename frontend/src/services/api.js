@@ -1,7 +1,7 @@
 /**
  * API SERVICE
  * Centralized service for all backend API calls
- * Uses Axios for HTTP requests
+ * Uses Axios for HTTP requests with Clerk authentication
  */
 
 import axios from 'axios'
@@ -18,15 +18,23 @@ const api = axios.create({
   timeout: 10000, // 10 seconds timeout
 })
 
-// Request interceptor - Add auth token to requests
+// Request interceptor - Add Clerk auth token to requests
 api.interceptors.request.use(
-  (config) => {
-    // Get token from localStorage
-    const token = localStorage.getItem('token')
-    
-    // If token exists, add to Authorization header
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+  async (config) => {
+    // Get the Clerk session token
+    try {
+      // Get Clerk instance to access the session
+      const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+      if (clerkPublishableKey && window.Clerk) {
+        const token = await window.Clerk.session?.getToken()
+        
+        // If token exists, add to Authorization header
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`
+        }
+      }
+    } catch (error) {
+      console.error('Failed to get Clerk token:', error)
     }
     
     console.log('🚀 API Request:', config.method.toUpperCase(), config.url)
@@ -52,7 +60,6 @@ api.interceptors.response.use(
       
       // Handle 401 Unauthorized - redirect to login
       if (error.response.status === 401) {
-        localStorage.removeItem('token')
         window.location.href = '/login'
       }
     } else if (error.request) {
@@ -68,58 +75,8 @@ api.interceptors.response.use(
 )
 
 // ================================
-// AUTH ENDPOINTS
+// AUTH ENDPOINTS (Removed - now handled by Clerk)
 // ================================
-
-/**
- * Register a new user
- * @param {Object} userData - User registration data
- * @param {string} userData.name - User's full name
- * @param {string} userData.email - User's email address
- * @param {string} userData.password - User's password
- * @returns {Promise} Response with token and user data
- */
-export const register = async (userData) => {
-  try {
-    console.log('📝 Registering user:', userData.email)
-    
-    const response = await api.post('/auth/register', {
-      name: userData.name,
-      email: userData.email,
-      password: userData.password,
-    })
-    
-    console.log('✅ Registration successful:', response.data)
-    return response.data
-  } catch (error) {
-    console.error('❌ Registration failed:', error.response?.data?.message || error.message)
-    throw error
-  }
-}
-
-/**
- * Login existing user
- * @param {Object} credentials - Login credentials
- * @param {string} credentials.email - User's email
- * @param {string} credentials.password - User's password
- * @returns {Promise} Response with token and user data
- */
-export const login = async (credentials) => {
-  try {
-    console.log('🔐 Logging in user:', credentials.email)
-    
-    const response = await api.post('/auth/login', {
-      email: credentials.email,
-      password: credentials.password,
-    })
-    
-    console.log('✅ Login successful:', response.data)
-    return response.data
-  } catch (error) {
-    console.error('❌ Login failed:', error.response?.data?.message || error.message)
-    throw error
-  }
-}
 
 // ================================
 // EMAIL ENDPOINTS

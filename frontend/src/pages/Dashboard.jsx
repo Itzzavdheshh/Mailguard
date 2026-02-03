@@ -4,15 +4,16 @@
  */
 
 import { useState, useEffect } from 'react'
-import { useAuth } from '../context/AuthContext'
+import { useUser, useClerk } from '@clerk/clerk-react'
 import { getEmailStats, getEmails, deleteEmail, bulkDeleteEmails, cleanPhishingEmails, submitFeedback } from '../services/api'
 import EmailTable from '../components/EmailTable'
 import EmailStatsChart from '../components/EmailStatsChart'
 import Logo from '../components/Logo'
 
 function Dashboard() {
-  const { user, logout } = useAuth()
-  const displayName = user?.name || user?.email || 'User'
+  const { user } = useUser()
+  const { signOut } = useClerk()
+  const displayName = user?.fullName || user?.primaryEmailAddress?.emailAddress || 'User'
   
   // Stats state
   const [stats, setStats] = useState({
@@ -230,9 +231,9 @@ function Dashboard() {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (window.confirm('Are you sure you want to logout?')) {
-      logout()
+      await signOut()
     }
   }
 

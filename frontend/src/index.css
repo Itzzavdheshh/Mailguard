@@ -10,3 +10,16 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Clerk UI subtle enhancements */
+.cl-formButtonPrimary {
+  transition: all 0.2s ease;
+}
+
+.cl-socialButtonsBlockButton {
+  transition: all 0.2s ease;
+}
+
+.cl-formFieldInput {
+  transition: all 0.2s ease;
+}

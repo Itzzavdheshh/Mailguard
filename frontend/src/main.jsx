@@ -28,31 +28,38 @@ createRoot(document.getElementById('root')).render(
           colorInputText: '#f1f5f9',
           colorText: '#f1f5f9',
           colorTextSecondary: '#94a3b8',
-          colorDanger: '#ef4444',
           borderRadius: '0.5rem',
+          spacingUnit: '0.5rem',
         },
         elements: {
           rootBox: 'flex items-center justify-center min-h-screen bg-slate-900',
-          card: 'bg-slate-800 shadow-xl border-0 rounded-xl p-8',
-          headerTitle: 'text-white text-2xl font-bold mb-2',
-          headerSubtitle: 'text-slate-400 text-sm mb-6',
-          formFieldLabel: 'text-slate-300 font-medium text-sm mb-2',
-          formFieldInput: 'bg-slate-700 border-0 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500',
-          formButtonPrimary: 'bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3',
-          footerActionLink: 'text-indigo-400 hover:text-indigo-300 font-semibold',
-          footerActionText: 'text-slate-400',
-          socialButtonsBlockButton: 'bg-white hover:bg-gray-50 border-0 py-3',
-          socialButtonsBlockButtonText: 'text-gray-700 font-medium',
-          socialButtonsIconButton: 'brightness-100',
-          dividerLine: 'bg-slate-700 h-px',
-          dividerText: 'text-slate-500 text-sm px-4',
+          card: 'bg-slate-800/90 backdrop-blur shadow-2xl border border-slate-700 rounded-xl p-6 max-w-md w-full mx-4',
+          
+          headerTitle: 'text-white text-xl font-bold mb-1',
+          headerSubtitle: 'text-slate-400 text-sm mb-4',
+          
+          socialButtonsBlockButton: 'bg-white hover:bg-gray-100 text-slate-800 border-0 py-2.5 px-4 rounded-lg font-medium shadow-sm mb-3',
+          socialButtonsBlockButtonText: '!text-slate-800 font-medium',
+          socialButtonsProviderIcon: 'w-5 h-5',
+          
+          dividerLine: 'bg-slate-700',
+          dividerText: 'text-slate-500 text-xs',
+          dividerRow: 'my-4',
+          
+          formFieldLabel: 'text-slate-300 font-medium text-sm mb-1.5',
+          formFieldInput: 'bg-slate-700/50 border border-slate-600 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 focus:border-transparent py-2.5 px-3 rounded-lg',
+          formFieldRow: 'mb-3',
+          
+          formButtonPrimary: 'bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-4 rounded-lg shadow-md mt-4',
+          
+          footerActionLink: 'text-indigo-400 hover:text-indigo-300 font-medium',
+          footerActionText: 'text-slate-400 text-sm',
+          footer: 'mt-4 text-center',
+          
           formFieldInputShowPasswordButton: 'text-slate-400 hover:text-slate-200',
-          identityPreviewText: 'text-slate-300',
-          identityPreviewEditButton: 'text-indigo-400 hover:text-indigo-300',
-          form: 'space-y-4',
-          formFieldRow: 'mb-4',
-          main: 'space-y-4',
-          footer: 'mt-6',
+          
+          main: 'space-y-3',
+          form: 'space-y-3',
         }
       }}
     >

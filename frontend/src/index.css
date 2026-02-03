@@ -11,15 +11,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Clerk UI subtle enhancements */
-.cl-formButtonPrimary {
-  transition: all 0.2s ease;
+/* Force dark text on Google button */
+.cl-socialButtonsBlockButton span {
+  color: #1e293b !important;
 }
 
-.cl-socialButtonsBlockButton {
-  transition: all 0.2s ease;
+/* Compact spacing */
+.cl-card {
+  padding: 1.5rem !important;
 }
 
+/* Smooth transitions */
+.cl-formButtonPrimary,
+.cl-socialButtonsBlockButton,
 .cl-formFieldInput {
   transition: all 0.2s ease;
 }
+

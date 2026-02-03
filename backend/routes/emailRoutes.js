@@ -15,6 +15,9 @@ router.post('/classify', emailController.classifyEmails);
 // Get classification statistics
 router.get('/stats', emailController.getClassificationStats);
 
+// Get all emails (alias for /classified for backward compatibility)
+router.get('/', emailController.getClassifiedEmails);
+
 // Get classified emails
 router.get('/classified', emailController.getClassifiedEmails);
 

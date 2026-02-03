@@ -197,14 +197,17 @@ function Dashboard() {
         return
       }
 
+      // Normalize prediction - ML returns "safe" but backend expects "legitimate"
+      const normalizedPrediction = email.prediction.toLowerCase() === 'safe' ? 'legitimate' : email.prediction.toLowerCase()
+
       // Determine correct label based on feedback type
       let correctLabel
       if (type === 'correct') {
         // Current prediction is correct, keep it
-        correctLabel = email.prediction
+        correctLabel = normalizedPrediction
       } else {
         // Wrong prediction, flip it
-        correctLabel = email.prediction.toLowerCase() === 'phishing' ? 'legitimate' : 'phishing'
+        correctLabel = normalizedPrediction === 'phishing' ? 'legitimate' : 'phishing'
       }
 
       const feedbackData = {
@@ -224,7 +227,15 @@ function Dashboard() {
     } catch (err) {
       console.error('❌ Failed to submit feedback:', err)
       console.error('❌ Error details:', err.response?.data)
-      alert(`Failed to submit feedback: ${err.response?.data?.error || err.message}`)
+      
+      // Handle specific error types
+      if (err.response?.status === 403) {
+        alert('⚠️ This email belongs to another user. Please click "Fix Now" on the yellow banner at the top to migrate all emails to your account!')
+      } else if (err.response?.status === 400) {
+        alert(`❌ Invalid feedback data: ${err.response?.data?.error || 'Unknown error'}`)
+      } else {
+        alert(`Failed to submit feedback: ${err.response?.data?.error || err.message}`)
+      }
     }
   }
   

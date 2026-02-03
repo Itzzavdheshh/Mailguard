@@ -223,8 +223,8 @@ const fetchAndSaveEmails = async (req, res) => {
   try {
     const userId = req.mongoUserId;
 
-    // Get maxResults from query parameter or default to 20
-    const maxResults = parseInt(req.query.maxResults) || 20;
+    // Get maxResults from query parameter or default to 50 (increased for better coverage)
+    const maxResults = parseInt(req.query.maxResults) || 50;
 
     // Validate maxResults
     if (maxResults < 1 || maxResults > 100) {
@@ -315,21 +315,26 @@ const fetchAndSaveEmails = async (req, res) => {
     }
 
     console.log(`\n📊 Fetch Summary:`);
-    console.log(`   Total fetched: ${fetchedEmails.length}`);
-    console.log(`   Saved: ${savedCount}`);
-    console.log(`   Duplicates: ${duplicateCount}`);
-    console.log(`   Errors: ${errorCount}\n`);
+    console.log(`   Total fetched from Gmail: ${fetchedEmails.length}`);
+    console.log(`   ✅ New emails saved: ${savedCount}`);
+    console.log(`   ⏭️  Already in database: ${duplicateCount}`);
+    console.log(`   ❌ Errors: ${errorCount}`);
+    console.log(`   📧 Total in your database: ${await Email.countDocuments({ userId: user._id })}\n`);
 
-    // Return success response
+    // Return success response with refetch suggestion
+    const totalInDb = await Email.countDocuments({ userId: user._id });
+    const shouldRefetch = savedCount > 0 && savedCount === fetchedEmails.length; // All were new
+    
     res.status(200).json({
       success: true,
-      message: 'Emails fetched and saved successfully',
+      message: savedCount > 0 ? `Fetched ${savedCount} new emails!` : 'No new emails found',
       data: {
         fetched: fetchedEmails.length,
         saved: savedCount,
         duplicates: duplicateCount,
         errors: errorCount,
-        totalInDatabase: await Email.countDocuments({ userId: user._id })
+        totalInDatabase: totalInDb,
+        shouldRefetch: shouldRefetch // Suggest fetching more if we got all new
       }
     });
 

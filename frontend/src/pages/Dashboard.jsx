@@ -330,7 +330,16 @@ function Dashboard() {
       
       // Show success message
       if (result.results.deleted > 0) {
-        alert(`Successfully cleaned ${result.results.deleted} phishing email(s)!\nStorage saved: ${result.results.storageSaved.mb} MB`)
+        const shouldFetchMore = window.confirm(
+          `Successfully cleaned ${result.results.deleted} phishing email(s)!\nStorage saved: ${result.results.storageSaved.mb} MB\n\n` +
+          `Would you like to fetch more emails from Gmail to replace the deleted ones?`
+        )
+        
+        if (shouldFetchMore) {
+          // Auto-fetch more emails (skip confirmation since user already confirmed)
+          await handleFetchEmails(true)
+          return // handleFetchEmails already refreshes
+        }
       } else {
         alert('No phishing emails found to clean.')
       }
@@ -366,8 +375,8 @@ function Dashboard() {
   }
   
   // Handle fetching emails from Gmail
-  const handleFetchEmails = async () => {
-    if (!window.confirm('Fetch latest emails from Gmail and scan for phishing?')) {
+  const handleFetchEmails = async (skipConfirm = false) => {
+    if (!skipConfirm && !window.confirm('Fetch latest emails from Gmail and scan for phishing?')) {
       return
     }
     
@@ -383,11 +392,25 @@ function Dashboard() {
       const classifyResponse = await classifyEmails()
       console.log('✅ Emails classified:', classifyResponse)
       
-      alert(`Successfully fetched ${fetchResponse.data.fetched} emails!\nClassified: ${classifyResponse.stats.processed} | Phishing: ${classifyResponse.stats.phishing} | Safe: ${classifyResponse.stats.safe}`)
+      const message = `✅ Fetched ${fetchResponse.data.fetched} emails (${fetchResponse.data.saved} new)!\n` +
+        `📊 Classified: ${classifyResponse.stats.processed} emails\n` +
+        `🚨 Phishing: ${classifyResponse.stats.phishing} | ✅ Safe: ${classifyResponse.stats.safe}`
+      
+      if (!skipConfirm) {
+        alert(message)
+      }
       
       // Refresh emails and stats
       fetchEmails()
       fetchStats()
+      
+      // Auto-refetch if we got all new emails (means there might be more)
+      if (fetchResponse.data.shouldRefetch && fetchResponse.data.saved === fetchResponse.data.fetched) {
+        const fetchMore = window.confirm('All fetched emails were new! Would you like to fetch more?')
+        if (fetchMore) {
+          await handleFetchEmails(true) // Skip confirmation for auto-refetch
+        }
+      }
     } catch (err) {
       console.error('❌ Failed to fetch emails:', err)
       

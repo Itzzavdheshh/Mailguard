@@ -12,17 +12,26 @@ body {
   background-color: #000000;
 }
 
-/* Remove decorative corners from Clerk card */
+/* Force remove ALL decorative elements and corners */
 .cl-card::before,
 .cl-card::after,
 .cl-cardBox::before,
-.cl-cardBox::after {
+.cl-cardBox::after,
+.cl-internal-b3fm6y::before,
+.cl-internal-b3fm6y::after,
+[class*="cl-internal"]::before,
+[class*="cl-internal"]::after {
+  content: none !important;
   display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 /* Force white text for Google button */
-.cl-socialButtonsBlockButton span {
-  color: #111827 !important;
+.cl-socialButtonsBlockButton,
+.cl-socialButtonsBlockButton span,
+.cl-socialButtonsBlockButtonText {
+  color: #ffffff !important;
 }
 
 

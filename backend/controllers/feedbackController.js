@@ -150,7 +150,7 @@ exports.submitFeedback = async (req, res) => {
  */
 exports.getUserFeedback = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.mongoUserId;
 
     // Get all feedback with email details populated
     const feedbacks = await Feedback.find({ userId })
@@ -197,7 +197,7 @@ exports.getUserFeedback = async (req, res) => {
  */
 exports.getFeedbackStats = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.mongoUserId;
 
     // Get user-specific stats
     const userFeedbacks = await Feedback.find({ userId });
@@ -249,7 +249,7 @@ exports.getFeedbackStats = async (req, res) => {
 exports.deleteFeedback = async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.mongoUserId;
 
     // Find feedback
     const feedback = await Feedback.findById(id);

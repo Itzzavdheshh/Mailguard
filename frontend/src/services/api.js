@@ -235,5 +235,37 @@ export const classifyEmails = async () => {
   }
 }
 
+// ================================
+// DATA MIGRATION
+// ================================
+
+/**
+ * Migrate all emails to current user
+ * @returns {Promise} Migration results
+ */
+export const migrateEmails = async () => {
+  try {
+    const response = await api.post('/migration/update-emails')
+    return response.data
+  } catch (error) {
+    console.error('❌ Failed to migrate emails:', error)
+    throw error
+  }
+}
+
+/**
+ * Get migration status
+ * @returns {Promise} Migration status
+ */
+export const getMigrationStatus = async () => {
+  try {
+    const response = await api.get('/migration/status')
+    return response.data
+  } catch (error) {
+    console.error('❌ Failed to get migration status:', error)
+    throw error
+  }
+}
+
 // Export the axios instance for custom requests
 export default api

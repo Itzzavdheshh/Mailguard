@@ -229,13 +229,14 @@ const fetchAndSaveEmails = async (req, res) => {
       maxResults = 50,
       dateFrom,
       dateTo,
-      query = '' // Gmail search query (e.g., "from:someone@example.com" or "has:attachment")
+      query = '', // Gmail search query (e.g., "from:someone@example.com" or "has:attachment")
+      fetchAll = false // Fetch all emails without limit
     } = req.body;
 
-    // Validate maxResults
-    const validatedMax = Math.min(Math.max(parseInt(maxResults), 1), 100); // Between 1 and 100
+    // Validate maxResults (ignored if fetchAll is true)
+    const validatedMax = fetchAll ? 500 : Math.min(Math.max(parseInt(maxResults), 1), 100); // Between 1 and 100, or 500 for fetchAll
     
-    console.log(`📋 Fetch params: maxResults=${validatedMax}, dateFrom=${dateFrom || 'none'}, dateTo=${dateTo || 'none'}, query="${query}"`);
+    console.log(`📋 Fetch params: fetchAll=${fetchAll}, maxResults=${validatedMax}, dateFrom=${dateFrom || 'none'}, dateTo=${dateTo || 'none'}, query="${query}"`);
 
     // Get user from database
     const user = await User.findById(userId);

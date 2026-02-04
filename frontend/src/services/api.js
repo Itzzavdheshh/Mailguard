@@ -223,6 +223,7 @@ export const initiateGmailAuth = async () => {
  * @param {string} params.dateFrom - Start date (ISO string)
  * @param {string} params.dateTo - End date (ISO string)
  * @param {string} params.query - Gmail search query
+ * @param {boolean} params.fetchAll - Fetch all emails without limit
  * @returns {Promise} Fetched emails count
  */
 export const fetchGmailEmails = async (params = {}) => {

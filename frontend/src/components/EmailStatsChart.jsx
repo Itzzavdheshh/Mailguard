@@ -7,7 +7,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 
 const COLORS = {
   phishing: '#EF4444', // red-500
-  safe: '#10B981',     // green-500
+  safe: '#22C55E',     // green-500
 }
 
 function EmailStatsChart({ stats, loading }) {
@@ -78,7 +78,7 @@ function EmailStatsChart({ stats, loading }) {
   }
 
   return (
-    <div className="bg-gray-900/60 backdrop-blur-sm rounded-xl border border-gray-800 p-6 mb-8">
+    <div className="bg-gray-900/40 backdrop-blur-sm rounded-xl border border-gray-800 p-6 mb-8">
       <h3 className="text-lg font-semibold text-white mb-4">Email Distribution</h3>
       
       {/* Chart */}

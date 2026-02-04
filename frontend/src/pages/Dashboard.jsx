@@ -70,7 +70,8 @@ function Dashboard() {
     maxResults: 50,
     dateFrom: '',
     dateTo: '',
-    query: ''
+    query: '',
+    fetchAll: false
   })
   const [showFetchOptions, setShowFetchOptions] = useState(false)
 
@@ -509,7 +510,7 @@ function Dashboard() {
                 className={`px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center space-x-2 ${
                   migrating
                     ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                    : 'bg-yellow-600 hover:bg-yellow-700 text-white shadow-lg'
+                    : 'bg-yellow-600 hover:bg-yellow-700 text-white'
                 }`}
               >
                 {migrating ? (
@@ -544,11 +545,11 @@ function Dashboard() {
         </div>
         
         {/* Gmail Connection Section */}
-        <div className="mb-8 bg-gradient-to-r from-blue-900/40 to-purple-900/40 backdrop-blur-sm rounded-xl border border-blue-500/30 p-6">
+        <div className="mb-8 bg-gray-900/40 backdrop-blur-sm rounded-xl border border-gray-700 p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-blue-600/30 rounded-lg border border-blue-400/40">
-                <svg className="w-8 h-8 text-blue-300" fill="currentColor" viewBox="0 0 24 24">
+              <div className="p-3 bg-gray-800 rounded-lg border border-gray-700">
+                <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
                 </svg>
               </div>
@@ -570,7 +571,7 @@ function Dashboard() {
               {!gmailConnected ? (
                 <button
                   onClick={handleConnectGmail}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold rounded-lg transition duration-200 shadow-lg shadow-blue-900/50 flex items-center space-x-2"
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200 flex items-center space-x-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -581,7 +582,7 @@ function Dashboard() {
                 <>
                   <button
                     onClick={() => setShowFetchOptions(!showFetchOptions)}
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200 flex items-center space-x-2 shadow-lg shadow-blue-900/50"
+                    className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition duration-200 flex items-center space-x-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -594,7 +595,7 @@ function Dashboard() {
                     className={`px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center space-x-2 ${
                       fetchingEmails
                         ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                        : 'bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-900/50'
+                        : 'bg-green-600 hover:bg-green-700 text-white'
                     }`}
                   >
                     {fetchingEmails ? (
@@ -624,10 +625,23 @@ function Dashboard() {
             <div className="mt-4 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
               <h4 className="text-lg font-semibold text-white mb-4">Gmail Fetch Options</h4>
               
+              <div className="mb-4 flex items-center space-x-3 p-3 bg-gray-900/50 rounded-lg border border-gray-700">
+                <input
+                  type="checkbox"
+                  id="fetchAll"
+                  checked={gmailFetchOptions.fetchAll || false}
+                  onChange={(e) => setGmailFetchOptions({ ...gmailFetchOptions, fetchAll: e.target.checked })}
+                  className="w-5 h-5 rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="fetchAll" className="text-sm font-medium text-white cursor-pointer">
+                  Fetch All Emails (No Limit) - ⚠️ This may take a while
+                </label>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-400 mb-2">
-                    Number of Emails (1-100)
+                    Number of Emails {gmailFetchOptions.fetchAll ? '(Ignored when Fetch All is checked)' : '(1-100)'}
                   </label>
                   <input
                     type="number"
@@ -635,7 +649,8 @@ function Dashboard() {
                     max="100"
                     value={gmailFetchOptions.maxResults}
                     onChange={(e) => setGmailFetchOptions({ ...gmailFetchOptions, maxResults: parseInt(e.target.value) || 50 })}
-                    className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                    disabled={gmailFetchOptions.fetchAll}
+                    className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
                 
@@ -712,10 +727,10 @@ function Dashboard() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           {/* Total Emails Card */}
-          <div className="bg-gray-900/60 backdrop-blur-sm rounded-xl border border-gray-800 p-6 hover:border-gray-700 transition duration-200">
+          <div className="bg-gray-900/40 backdrop-blur-sm rounded-xl border border-gray-800 p-6 hover:border-gray-700 transition duration-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-600/20 rounded-lg border border-blue-500/30">
-                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-3 bg-gray-800 rounded-lg">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -734,10 +749,10 @@ function Dashboard() {
           </div>
 
           {/* Phishing Detected Card */}
-          <div className="bg-gray-900/60 backdrop-blur-sm rounded-xl border border-gray-800 p-6 hover:border-gray-700 transition duration-200">
+          <div className="bg-gray-900/40 backdrop-blur-sm rounded-xl border border-gray-800 p-6 hover:border-gray-700 transition duration-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-red-600/20 rounded-lg border border-red-500/30">
-                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-3 bg-gray-800 rounded-lg">
+                <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
@@ -756,10 +771,10 @@ function Dashboard() {
           </div>
 
           {/* Safe Emails Card */}
-          <div className="bg-gray-900/60 backdrop-blur-sm rounded-xl border border-gray-800 p-6 hover:border-gray-700 transition duration-200">
+          <div className="bg-gray-900/40 backdrop-blur-sm rounded-xl border border-gray-800 p-6 hover:border-gray-700 transition duration-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-green-600/20 rounded-lg border border-green-500/30">
-                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-3 bg-gray-800 rounded-lg">
+                <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -778,17 +793,17 @@ function Dashboard() {
           </div>
           
           {/* Storage Saved Card */}
-          <div className="bg-gradient-to-br from-purple-900/40 to-blue-900/40 backdrop-blur-sm rounded-xl border border-purple-500/30 p-6 hover:border-purple-500/50 transition duration-200">
+          <div className="bg-gray-900/40 backdrop-blur-sm rounded-xl border border-gray-800 p-6 hover:border-gray-700 transition duration-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-purple-600/30 rounded-lg border border-purple-400/40">
-                <svg className="w-6 h-6 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-3 bg-gray-800 rounded-lg">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                 </svg>
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-purple-300 mb-1">{storageSaved.mbSaved.toFixed(2)} MB</h3>
-            <p className="text-gray-300 text-sm">Storage Saved</p>
-            <p className="text-xs text-purple-400 mt-2">
+            <h3 className="text-2xl font-bold text-white mb-1">{storageSaved.mbSaved.toFixed(2)} MB</h3>
+            <p className="text-gray-400 text-sm">Storage Saved</p>
+            <p className="text-xs text-gray-500 mt-2">
               🗑️ {storageSaved.emailsDeleted} emails cleaned
             </p>
           </div>
@@ -805,7 +820,7 @@ function Dashboard() {
         <EmailStatsChart stats={stats} loading={statsLoading} />
 
         {/* Filters and Search Section */}
-        <div className="mb-6 bg-gray-900/60 backdrop-blur-sm rounded-xl border border-gray-800 p-6">
+        <div className="mb-6 bg-gray-900/40 backdrop-blur-sm rounded-xl border border-gray-800 p-6">
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -976,7 +991,7 @@ function Dashboard() {
             disabled={selectedEmails.length === 0}
             className={`px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center space-x-2 ${
               selectedEmails.length > 0
-                ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-900/50'
+                ? 'bg-red-600 hover:bg-red-700 text-white'
                 : 'bg-gray-800 text-gray-500 cursor-not-allowed'
             }`}
           >
@@ -989,7 +1004,7 @@ function Dashboard() {
           {/* Clean All Phishing Button */}
           <button
             onClick={handleCleanPhishing}
-            className="px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 text-white rounded-lg font-semibold transition duration-200 flex items-center space-x-2 shadow-lg shadow-orange-900/50"
+            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition duration-200 flex items-center space-x-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />

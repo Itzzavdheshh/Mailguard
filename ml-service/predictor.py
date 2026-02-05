@@ -188,9 +188,19 @@ def predict_email(text):
     """
     global vectorizer, model, model_loaded
     
+    # Validate input text
+    if text is None or not isinstance(text, str):
+        raise ValueError("Email text must be a string")
+    
+    if not text.strip():
+        raise ValueError("Email text cannot be empty or whitespace-only")
+    
     # Check if models are loaded
     if not model_loaded or vectorizer is None or model is None:
-        raise Exception("Models not loaded. Please restart the service.")
+        raise RuntimeError(
+            "ML models are not loaded. Please check model files exist: "
+            f"vectorizer.pkl and phishing_model.pkl"
+        )
     
     try:
         # Preprocess and vectorize the text
@@ -214,8 +224,11 @@ def predict_email(text):
         
         return result
         
+    except (ValueError, RuntimeError):
+        # Re-raise validation and model errors as-is
+        raise
     except Exception as e:
-        raise Exception(f"Prediction error: {str(e)}")
+        raise RuntimeError(f"Prediction error: {str(e)}")
 
 
 # Load models when module is imported

@@ -92,8 +92,15 @@ async def predict(request: PredictionRequest):
         
     except HTTPException:
         raise
+    except ValueError as e:
+        # Input validation errors (empty text, wrong type, etc.)
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        # Model loading or prediction errors
+        raise HTTPException(status_code=503, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Unexpected errors
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
 
 # Model reload endpoint

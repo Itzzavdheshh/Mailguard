@@ -8,7 +8,6 @@ import { useUser, useClerk } from '@clerk/clerk-react'
 import { getEmailStats, getEmails, deleteEmail, bulkDeleteEmails, cleanPhishingEmails, submitFeedback, initiateGmailAuth, fetchGmailEmails, classifyEmails, migrateEmails, getMigrationStatus } from '../services/api'
 import EmailTable from '../components/EmailTable'
 import EmailStatsChart from '../components/EmailStatsChart'
-import Logo from '../components/Logo'
 
 function Dashboard() {
   const { user } = useUser()
@@ -463,86 +462,63 @@ function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Navigation Bar */}
-      <nav className="bg-gray-900/80 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <Logo size="md" showText={true} />
-
-            {/* User Menu */}
+    <div>
+      {/* Migration Warning Banner */}
+      {migrationNeeded && (
+        <div className="mb-6 bg-yellow-50 rounded-xl border border-yellow-200 p-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <span className="text-gray-300 font-medium">👤 {displayName}</span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-600/10 hover:bg-red-600/20 text-red-400 hover:text-red-300 border border-red-500/50 rounded-lg transition font-medium"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Migration Warning Banner */}
-        {migrationNeeded && (
-          <div className="mb-6 bg-yellow-900/40 backdrop-blur-sm rounded-xl border border-yellow-500/50 p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="p-3 bg-yellow-600/30 rounded-lg border border-yellow-400/40">
-                  <svg className="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-yellow-200 mb-1">⚠️ Email Migration Required</h3>
-                  <p className="text-sm text-yellow-100/80">
-                    Your existing emails need to be migrated to your new Clerk account. Click "Fix Now" to update ownership.
-                  </p>
-                </div>
+              <div className="p-3 bg-yellow-100 rounded-lg">
+                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
               </div>
-              <button
-                onClick={handleMigrateEmails}
-                disabled={migrating}
-                className={`px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center space-x-2 ${
-                  migrating
-                    ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                    : 'bg-yellow-600 hover:bg-yellow-700 text-white'
-                }`}
-              >
-                {migrating ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Migrating...</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Fix Now</span>
-                  </>
-                )}
-              </button>
+              <div>
+                <h3 className="text-lg font-semibold text-yellow-900 mb-1">⚠️ Email Migration Required</h3>
+                <p className="text-sm text-yellow-700">
+                  Your existing emails need to be migrated to your new Clerk account. Click "Fix Now" to update ownership.
+                </p>
+              </div>
             </div>
+            <button
+              onClick={handleMigrateEmails}
+              disabled={migrating}
+              className={`px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center space-x-2 ${
+                migrating
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-yellow-600 hover:bg-yellow-700 text-white'
+              }`}
+            >
+              {migrating ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Migrating...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Fix Now</span>
+                </>
+              )}
+            </button>
           </div>
-        )}
-
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Welcome back, {displayName}! 👋
-          </h1>
-          <p className="text-gray-400">
-            Here's your email security overview
-          </p>
         </div>
+      )}
+
+      {/* Welcome Section */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Welcome back, {displayName}! 👋
+        </h1>
+        <p className="text-gray-600">
+          Here's your email security overview
+        </p>
+      </div>
         
         {/* Gmail Connection Section */}
         <div className="mb-8 bg-gray-900/40 backdrop-blur-sm rounded-xl border border-gray-700 p-6">
@@ -1031,7 +1007,6 @@ function Dashboard() {
           </p>
         </div>
       </div>
-    </div>
   )
 }
 

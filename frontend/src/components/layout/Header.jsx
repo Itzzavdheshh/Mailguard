@@ -1,0 +1,49 @@
+/**
+ * Header Component
+ * Top navigation bar with user info and actions
+ */
+
+import { UserButton, useUser } from '@clerk/clerk-react'
+import { Bell, Search } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+
+export default function Header() {
+  const { user } = useUser()
+  const displayName = user?.fullName || user?.primaryEmailAddress?.emailAddress || 'User'
+
+  return (
+    <header className="h-16 border-b border-gray-200 bg-white sticky top-0 z-30">
+      <div className="h-full flex items-center justify-between px-6">
+        {/* Left side - Search */}
+        <div className="flex items-center gap-4 flex-1 max-w-md">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search emails..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        {/* Right side - User actions */}
+        <div className="flex items-center gap-4">
+          {/* Notifications */}
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+          </Button>
+
+          {/* User info */}
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-medium text-gray-900">{displayName}</p>
+              <p className="text-xs text-gray-500">Administrator</p>
+            </div>
+            <UserButton afterSignOutUrl="/login" />
+          </div>
+        </div>
+      </div>
+    </header>
+  )
+}

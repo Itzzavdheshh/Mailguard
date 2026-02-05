@@ -21,6 +21,7 @@ const app = express();
 
 // Import middleware
 const requestLogger = require('./middleware/requestLogger');
+const { apiLimiter } = require('./middleware/rateLimiter');
 
 // ================================================
 // MIDDLEWARE CONFIGURATION
@@ -28,6 +29,9 @@ const requestLogger = require('./middleware/requestLogger');
 
 // Request logging (minimal, production-safe)
 app.use(requestLogger);
+
+// Rate limiting for API protection
+app.use('/api/', apiLimiter);
 
 // Enable JSON parsing for incoming requests
 app.use(express.json());

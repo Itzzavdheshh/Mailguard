@@ -14,6 +14,7 @@ const {
 // Import JWT authentication middleware
 const authMiddleware = require('../middleware/authMiddleware');
 const syncUserMiddleware = require('../middleware/syncUserMiddleware');
+const { gmailFetchLimiter } = require('../middleware/rateLimiter');
 
 /**
  * GMAIL OAUTH ROUTES
@@ -63,7 +64,8 @@ router.delete('/disconnect', authMiddleware, syncUserMiddleware, disconnectGmail
  * @header  Authorization: Bearer <token>
  * @query   maxResults - Number of emails to fetch (default: 20, max: 100)
  * @returns Statistics about fetched and saved emails
+ * @ratelimit 10 requests per hour per IP
  */
-router.post('/fetch', authMiddleware, syncUserMiddleware, fetchAndSaveEmails);
+router.post('/fetch', gmailFetchLimiter, authMiddleware, syncUserMiddleware, fetchAndSaveEmails);
 // Export the router
 module.exports = router;

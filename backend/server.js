@@ -66,6 +66,19 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/migration', migrationRoutes);
 
 // ================================================
+// ERROR HANDLING
+// ================================================
+
+// Import error handlers
+const { notFoundHandler, errorHandler } = require('./middleware/errorHandler');
+
+// 404 handler - must be after all routes
+app.use(notFoundHandler);
+
+// Global error handler - must be last
+app.use(errorHandler);
+
+// ================================================
 // SERVER STARTUP
 // ================================================
 

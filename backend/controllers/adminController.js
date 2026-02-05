@@ -79,10 +79,14 @@ exports.triggerRetraining = async (req, res) => {
     });
     
     // Step 3: Run retraining script
-    console.log('\n🚀 Step 3: Starting model retraining...');
-    
     const retrainResult = await new Promise((resolve, reject) => {
-      //t retrainResult = await new Promise((resolve, reject) => {
+      const args = [
+        RETRAIN_SCRIPT_PATH,
+        '--data', TRAINING_DATA,
+        '--model', MODEL_TYPE
+      ];
+      
+      const pythonProcess = spawn('python', args, {
         cwd: path.join(__dirname, '../../ml-service')
       });
       
@@ -93,7 +97,6 @@ exports.triggerRetraining = async (req, res) => {
       pythonProcess.stdout.on('data', (data) => {
         const text = data.toString();
         stdout += text;
-        // Log progress in real-time
         process.stdout.write(text);
       });
       
@@ -115,8 +118,10 @@ exports.triggerRetraining = async (req, res) => {
       pythonProcess.on('error', (error) => {
         reject({ success: false, error: error.message });
       });
+      
       // Set timeout (5 minutes max)
-      setTthonProcess.kill();
+      setTimeout(() => {
+        pythonProcess.kill();
         reject({ success: false, error: 'Retraining timeout (5 minutes)' });
       }, 5 * 60 * 1000);
     });

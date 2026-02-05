@@ -5,10 +5,12 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const authMiddleware = require('../middleware/authMiddleware');
+const syncUserMiddleware = require('../middleware/syncUserMiddleware');
 
-// All admin routes require authentication
+// All admin routes require authentication and user sync
 // In production, add additional admin role check
 router.use(authMiddleware);
+router.use(syncUserMiddleware);
 
 /**
  * POST /api/admin/retrain

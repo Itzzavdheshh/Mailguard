@@ -261,6 +261,31 @@ class DatasetBuilder:
         
         return merged
     
+    def mark_feedback_as_used(self, feedback_df):
+        """
+        Mark all feedback entries as used in training
+        
+        Args:
+            feedback_df: DataFrame with feedback data
+        """
+        if feedback_df.empty:
+            return
+        
+        try:
+            print("\n✅ Marking feedback as used in training...")
+            feedback_collection = self.db['feedbacks']
+            
+            # Update all feedback entries
+            result = feedback_collection.update_many(
+                {},  # Update all feedback
+                {'$set': {'usedInTraining': True}}
+            )
+            
+            print(f"   Updated {result.modified_count} feedback entries")
+            
+        except Exception as e:
+            print(f"⚠️  Warning: Could not mark feedback as used: {e}")
+    
     def save_training_data(self, df):
         """
         Save training data to CSV file
@@ -329,6 +354,10 @@ class DatasetBuilder:
             
             # Save training data
             success = self.save_training_data(merged_df)
+            
+            # Mark feedback as used if save was successful
+            if success and not feedback_df.empty:
+                self.mark_feedback_as_used(feedback_df)
             
             return success
             

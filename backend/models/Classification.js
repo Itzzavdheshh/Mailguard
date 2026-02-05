@@ -15,26 +15,31 @@ const classificationSchema = new mongoose.Schema({
   prediction: {
     type: String,
     enum: ['phishing', 'safe'],
-    required: true
+    required: [true, 'Prediction is required'],
+    trim: true
   },
   
   // Confidence score (0-1)
   confidence: {
     type: Number,
-    required: true,
-    min: 0,
-    max: 1
+    required: [true, 'Confidence score is required'],
+    min: [0, 'Confidence must be at least 0'],
+    max: [1, 'Confidence cannot exceed 1']
   },
   
   // Probability breakdown
   probabilities: {
     safe: {
       type: Number,
-      required: true
+      required: [true, 'Safe probability is required'],
+      min: [0, 'Probability must be at least 0'],
+      max: [1, 'Probability cannot exceed 1']
     },
     phishing: {
       type: Number,
-      required: true
+      required: [true, 'Phishing probability is required'],
+      min: [0, 'Probability must be at least 0'],
+      max: [1, 'Probability cannot exceed 1']
     }
   },
   

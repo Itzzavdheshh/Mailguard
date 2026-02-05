@@ -29,6 +29,7 @@ const emailSchema = new mongoose.Schema(
       required: [true, 'Sender is required'],
       trim: true,
       lowercase: true,
+      maxlength: [320, 'Email address cannot exceed 320 characters'],
     },
 
     // Email subject line
@@ -37,6 +38,7 @@ const emailSchema = new mongoose.Schema(
       required: [true, 'Subject is required'],
       trim: true,
       default: '(No Subject)',
+      maxlength: [998, 'Subject cannot exceed 998 characters'],
     },
 
     // Email body content (plain text)

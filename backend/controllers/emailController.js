@@ -341,9 +341,19 @@ exports.deleteEmail = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Delete email error:', error);
+    
+    // Handle specific error types
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid email ID format'
+      });
+    }
+    
     res.status(500).json({
       success: false,
-      error: error.message
+      error: 'Failed to delete email',
+      details: error.message
     });
   }
 };
@@ -461,9 +471,19 @@ exports.bulkDeleteEmails = async (req, res) => {
 
   } catch (error) {
     console.error('❌ Bulk delete emails error:', error);
+    
+    // Handle specific error types
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid email ID format in emailIds array'
+      });
+    }
+    
     res.status(500).json({
       success: false,
-      error: error.message
+      error: 'Failed to bulk delete emails',
+      details: error.message
     });
   }
 };

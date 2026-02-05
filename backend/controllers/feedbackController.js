@@ -152,6 +152,22 @@ exports.submitFeedback = async (req, res) => {
       });
     }
 
+    // Handle specific error types
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid email ID format'
+      });
+    }
+    
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation failed',
+        details: error.message
+      });
+    }
+    
     return res.status(500).json({
       success: false,
       error: 'Failed to submit feedback',

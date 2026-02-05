@@ -365,15 +365,32 @@ const fetchAndSaveEmails = async (req, res) => {
   } catch (error) {
     console.error('Fetch and save error:', error);
     
-    // Provide helpful error messages
-    if (error.message.includes('Token may be expired')) {
+    // Handle specific error types with appropriate status codes
+    if (error.code === 401 || error.message.includes('Token may be expired') || error.message.includes('authentication failed')) {
       return res.status(401).json({
         success: false,
         message: 'Gmail token expired. Please reconnect Gmail.',
         action: 'Call DELETE /api/gmail/disconnect then GET /api/gmail/auth'
       });
     }
+    
+    if (error.code === 429) {
+      return res.status(429).json({
+        success: false,
+        message: 'Gmail API rate limit exceeded. Please try again later.',
+        retryAfter: '60 seconds'
+      });
+    }
+    
+    if (error.code === 503 || error.code === 'ENOTFOUND') {
+      return res.status(503).json({
+        success: false,
+        message: 'Cannot connect to Gmail servers',
+        error: 'Check your internet connection and try again'
+      });
+    }
 
+    // Generic error
     res.status(500).json({
       success: false,
       message: 'Failed to fetch and save emails',

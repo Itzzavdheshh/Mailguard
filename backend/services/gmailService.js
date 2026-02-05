@@ -100,12 +100,29 @@ const fetchEmails = async (user, maxResults = 20, searchQuery = 'in:inbox') => {
   } catch (error) {
     console.error('❌ Gmail fetch error:', error.message);
     
-    // Provide helpful error messages
-    if (error.code === 401) {
-      throw new Error('Gmail authentication failed. Token may be expired. Please reconnect Gmail.');
+    // Provide helpful error messages based on error type
+    if (error.code === 401 || error.code === 403) {
+      const authError = new Error('Gmail authentication failed. Token may be expired. Please reconnect Gmail.');
+      authError.code = 401;
+      throw authError;
     }
     
-    throw new Error(`Failed to fetch emails from Gmail: ${error.message}`);
+    if (error.code === 429) {
+      const rateLimitError = new Error('Gmail API rate limit exceeded. Please try again later.');
+      rateLimitError.code = 429;
+      throw rateLimitError;
+    }
+    
+    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+      const networkError = new Error('Cannot connect to Gmail servers. Check your internet connection.');
+      networkError.code = 503;
+      throw networkError;
+    }
+    
+    // Generic error
+    const genericError = new Error(`Failed to fetch emails from Gmail: ${error.message}`);
+    genericError.code = error.code || 500;
+    throw genericError;
   }
 };
 

@@ -3,11 +3,15 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
+const validateEnv = require('./config/validateEnv');
 const { startScheduler } = require('./jobs/retrainJob');
 const { startScanJob } = require('./jobs/scanJob');
 
 // Load environment variables from .env file
 dotenv.config();
+
+// Validate environment variables before proceeding
+validateEnv();
 
 // Connect to MongoDB database
 connectDB();

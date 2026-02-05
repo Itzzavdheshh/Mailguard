@@ -122,20 +122,17 @@ exports.triggerRetraining = async (req, res) => {
     });
     
     // Step 4: Reload model in ML service
-    console.log('\n🔄 Step 4: Reloading model in ML service...');
-    try nst reloadResponse = await axios.post(
+    try {
+      const reloadResponse = await axios.post(
         `${ML_SERVICE_URL}/reload`,
         {},
         { timeout: 10000 }
       );
       
-      if (reloadResponse.data.success) {
-        console.log('✅ Model reloaded successfully');
-      } else {
-        console.log('⚠️  Model reload returned non-success status');
+      if (!reloadResponse.data.success) {
+        throw new Error('Model reload returned non-success status');
       }
     } catch (error) {
-      console.log('❌ Failed to reload model:', error.message);
       return res.status(500).json({
         success: false,
         error: 'Retraining succeeded but model reload failed',

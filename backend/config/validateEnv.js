@@ -33,6 +33,13 @@ const validateEnv = () => {
     warnings.push('ML_SERVICE_URL should start with http:// or https://');
   }
 
+  // Warn if FRONTEND_URL not set (will default to localhost:3000)
+  if (!process.env.FRONTEND_URL) {
+    warnings.push('FRONTEND_URL not set. CORS will allow http://localhost:3000 by default. Set this in production!');
+  } else if (!process.env.FRONTEND_URL.startsWith('http')) {
+    warnings.push('FRONTEND_URL should start with http:// or https://');
+  }
+
   // Report issues
   if (missing.length > 0) {
     console.error('\n❌ Missing required environment variables:');

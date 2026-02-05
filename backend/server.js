@@ -37,8 +37,13 @@ app.use('/api/', apiLimiter);
 app.use(express.json());
 
 // Enable CORS (Cross-Origin Resource Sharing)
-// Allows frontend on different domain to communicate with backend
-app.use(cors());
+// Restrict to specific frontend origin for security
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true, // Allow cookies and authorization headers
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 
 // ================================================
 // ROUTES

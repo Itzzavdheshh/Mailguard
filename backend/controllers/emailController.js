@@ -110,18 +110,25 @@ exports.classifyEmails = async (req, res) => {
 
       } catch (error) {
         console.error(`❌ Error classifying email ${email._id}:`, error.message);
-        
-        // Distinguish error types for better debugging
-        if (error.code === 11000) {
-          console.error('   Duplicate key error (should not happen with upsert)');
-        } else if (error.name === 'ValidationError') {
-          console.error('   Validation error:', error.message);
-        } else if (error.message?.includes('ML service')) {
-          console.error('   ML service error');
+          
+          // Distinguish error types for better debugging
+          if (error.code === 11000) {
+            console.error('   Duplicate key error (should not happen with upsert)');
+          } else if (error.name === 'ValidationError') {
+            console.error('   Validation error:', error.message);
+          }
+          
+          results.errors++;
         }
-        
-        results.errors++;
       }
+
+    } catch (error) {
+      // Handle batch prediction errors
+      console.error(`❌ Batch classification error:`, error.message);
+      return res.status(503).json({
+        error: 'ML service error',
+        message: error.message
+      });
     }
 
     res.json({

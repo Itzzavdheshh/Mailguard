@@ -103,6 +103,47 @@ async def predict(request: PredictionRequest):
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
 
+# Batch prediction endpoint
+@app.post("/predict/batch", response_model=BatchPredictionResponse)
+async def predict_batch(request: BatchPredictionRequest):
+    """
+    Predict multiple emails at once for better performance.
+    
+    Args:
+        request: BatchPredictionRequest with list of email texts
+        
+    Returns:
+        BatchPredictionResponse with list of predictions and count
+    """
+    try:
+        # Validate input
+        if not request.texts:
+            raise HTTPException(status_code=400, detail="Texts list cannot be empty")
+        
+        if len(request.texts) > 1000:
+            raise HTTPException(status_code=400, detail="Maximum 1000 texts per batch")
+        
+        # Make batch prediction
+        results = predictor.predict_emails_batch(request.texts)
+        
+        return {
+            "predictions": results,
+            "count": len(results)
+        }
+        
+    except HTTPException:
+        raise
+    except ValueError as e:
+        # Input validation errors
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        # Model loading or prediction errors
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception as e:
+        # Unexpected errors
+        raise HTTPException(status_code=500, detail=f"Batch prediction failed: {str(e)}")
+
+
 # Model reload endpoint
 @app.post("/reload")
 async def reload_models():

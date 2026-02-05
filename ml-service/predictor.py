@@ -231,6 +231,83 @@ def predict_email(text):
         raise RuntimeError(f"Prediction error: {str(e)}")
 
 
+def predict_emails_batch(texts):
+    """
+    Predict multiple emails at once for better performance.
+    
+    Args:
+        texts (list): List of email body texts to analyze
+        
+    Returns:
+        list: List of prediction results, one for each input text
+            Each result is a dict with:
+            {
+                "prediction": "phishing" | "safe",
+                "confidence": float (0-1),
+                "probabilities": {
+                    "safe": float,
+                    "phishing": float
+                }
+            }
+    """
+    global vectorizer, model, model_loaded
+    
+    # Validate input
+    if not isinstance(texts, list):
+        raise ValueError("Input must be a list of texts")
+    
+    if not texts:
+        raise ValueError("Input list cannot be empty")
+    
+    # Check if models are loaded
+    if not model_loaded or vectorizer is None or model is None:
+        raise RuntimeError(
+            "ML models are not loaded. Please check model files exist: "
+            f"vectorizer.pkl and phishing_model.pkl"
+        )
+    
+    try:
+        results = []
+        
+        # Validate all texts first
+        validated_texts = []
+        for i, text in enumerate(texts):
+            if text is None or not isinstance(text, str):
+                raise ValueError(f"Text at index {i} must be a string")
+            if not text.strip():
+                raise ValueError(f"Text at index {i} cannot be empty or whitespace-only")
+            validated_texts.append(text)
+        
+        # Vectorize all texts at once (more efficient than one-by-one)
+        texts_vectorized = vectorizer.transform(validated_texts)
+        
+        # Get predictions for all texts
+        predictions = model.predict(texts_vectorized)
+        
+        # Get probability scores for all texts
+        probabilities_array = model.predict_proba(texts_vectorized)
+        
+        # Format results
+        for pred, probs in zip(predictions, probabilities_array):
+            result = {
+                "prediction": "phishing" if pred == 1 else "safe",
+                "confidence": float(max(probs)),
+                "probabilities": {
+                    "safe": float(probs[0]),
+                    "phishing": float(probs[1])
+                }
+            }
+            results.append(result)
+        
+        return results
+        
+    except (ValueError, RuntimeError):
+        # Re-raise validation and model errors as-is
+        raise
+    except Exception as e:
+        raise RuntimeError(f"Batch prediction error: {str(e)}")
+
+
 # Load models when module is imported
 print("\n" + "="*50)
 print("🚀 Initializing ML Service")

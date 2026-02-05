@@ -62,6 +62,71 @@ async function predictEmail(text) {
 }
 
 /**
+ * Predict multiple emails at once (batch prediction)
+ * @param {Array<string>} texts - Array of email texts to analyze
+ * @returns {Promise<Array<Object>>} Array of prediction results
+ */
+async function predictEmailsBatch(texts) {
+  try {
+    // Validate input
+    if (!Array.isArray(texts)) {
+      throw new Error('Texts must be an array');
+    }
+
+    if (texts.length === 0) {
+      throw new Error('Texts array cannot be empty');
+    }
+
+    if (texts.length > 1000) {
+      throw new Error('Maximum 1000 emails per batch');
+    }
+
+    // Validate each text
+    for (let i = 0; i < texts.length; i++) {
+      if (!texts[i] || typeof texts[i] !== 'string' || texts[i].trim() === '') {
+        throw new Error(`Text at index ${i} is invalid`);
+      }
+    }
+
+    console.log(`🤖 Calling ML service for batch prediction (${texts.length} emails)...`);
+    
+    // Call Python ML service batch endpoint
+    const response = await axios.post(
+      `${ML_SERVICE_URL}/predict/batch`,
+      { texts },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        timeout: REQUEST_TIMEOUT * 5 // Longer timeout for batch
+      }
+    );
+
+    // Return prediction results
+    const results = response.data.predictions;
+    console.log(`✅ ML batch prediction received: ${results.length} predictions`);
+    
+    return results;
+
+  } catch (error) {
+    // Handle different error types
+    if (error.response) {
+      // ML service returned an error
+      console.error('❌ ML service batch error:', error.response.data);
+      throw new Error(`ML service batch error: ${error.response.data.detail || error.response.statusText}`);
+    } else if (error.request) {
+      // Request made but no response
+      console.error('❌ ML service batch timeout or unreachable');
+      throw new Error('ML service is unreachable or timed out');
+    } else {
+      // Other errors
+      console.error('❌ Batch prediction error:', error.message);
+      throw error;
+    }
+  }
+}
+
+/**
  * Check if ML service is healthy and running
  * @returns {Promise<boolean>} True if service is healthy
  */
@@ -94,6 +159,7 @@ async function getServiceInfo() {
 
 module.exports = {
   predictEmail,
+  predictEmailsBatch,
   checkHealth,
   getServiceInfo
 };

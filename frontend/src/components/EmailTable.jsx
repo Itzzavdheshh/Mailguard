@@ -150,11 +150,13 @@ function EmailRow({ email, onDelete, onFeedback, isSelected, onSelect }) {
     const prediction = email.prediction?.toLowerCase() || 'unknown'
     
     if (prediction === 'phishing') {
-      return <Badge variant="danger">Phishing</Badge>
+      return <Badge variant="danger">🚨 Phishing</Badge>
     } else if (prediction === 'safe' || prediction === 'legitimate') {
-      return <Badge variant="success">Safe</Badge>
+      return <Badge variant="success">✅ Safe</Badge>
+    } else if (prediction === 'pending') {
+      return <Badge variant="warning">⏳ Pending</Badge>
     } else {
-      return <Badge variant="secondary">Unknown</Badge>
+      return <Badge variant="secondary">❓ Unknown</Badge>
     }
   }
 

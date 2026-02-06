@@ -11,6 +11,12 @@ const validateEnv = () => {
     'ML_SERVICE_URL'
   ];
 
+  // ENCRYPTION_KEY is REQUIRED in production for secure token storage
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction && !process.env.ENCRYPTION_KEY) {
+    required.push('ENCRYPTION_KEY');
+  }
+
   const missing = [];
   const warnings = [];
 
@@ -36,6 +42,15 @@ const validateEnv = () => {
 
   if (process.env.GOOGLE_REDIRECT_URI && !process.env.GOOGLE_REDIRECT_URI.startsWith('http')) {
     warnings.push('GOOGLE_REDIRECT_URI should start with http:// or https://');
+  }
+
+  // Validate ENCRYPTION_KEY format (must be 64 hex characters for AES-256)
+  if (process.env.ENCRYPTION_KEY) {
+    if (!/^[0-9a-fA-F]{64}$/.test(process.env.ENCRYPTION_KEY)) {
+      warnings.push('ENCRYPTION_KEY must be 64 hexadecimal characters (32 bytes for AES-256). Generate with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"');
+    }
+  } else if (!isProduction) {
+    warnings.push('ENCRYPTION_KEY not set. Using insecure default for development. REQUIRED in production!');
   }
 
   // Warn if FRONTEND_URL not set (will default to localhost:3000)

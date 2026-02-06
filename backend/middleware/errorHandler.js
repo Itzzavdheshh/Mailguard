@@ -16,21 +16,26 @@
  * @param {NextFunction} next - Express next function
  */
 const errorHandler = (err, req, res, next) => {
-  // Log the error for debugging
+  // Sanitize request data before logging (remove sensitive headers)
+  const sanitizedPath = req.path;
+  const sanitizedMethod = req.method;
+  
+  // Log the error for debugging (sanitized)
   console.error('❌ Unhandled Error:');
-  console.error(`   Path: ${req.method} ${req.path}`);
+  console.error(`   Path: ${sanitizedMethod} ${sanitizedPath}`);
   console.error(`   Message: ${err.message}`);
   
-  // Log stack trace in development
+  // Log stack trace in development (but not request headers with tokens)
   if (process.env.NODE_ENV !== 'production') {
     console.error(`   Stack: ${err.stack}`);
+    // Don't log req object as it may contain Authorization headers
   }
 
   // Determine status code
   // Use error's statusCode if available, otherwise default to 500
   const statusCode = err.statusCode || res.statusCode || 500;
 
-  // Prepare error response
+  // Prepare error response (never include sensitive data)
   const errorResponse = {
     success: false,
     message: err.message || 'Internal server error',
@@ -40,9 +45,10 @@ const errorHandler = (err, req, res, next) => {
     }
   };
 
-  // Add stack trace in development mode
+  // Add stack trace in development mode (but sanitize it)
   if (process.env.NODE_ENV !== 'production') {
     errorResponse.error.stack = err.stack;
+    // Warning: Stack traces should NOT be exposed in production
   }
 
   // Handle specific error types

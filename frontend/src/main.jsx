@@ -18,6 +18,11 @@ if (!PUBLISHABLE_KEY) {
   throw new Error('Missing Clerk Publishable Key. Add VITE_CLERK_PUBLISHABLE_KEY to .env')
 }
 
+// Validate Clerk key format (should start with pk_test_ or pk_live_)
+if (!PUBLISHABLE_KEY.startsWith('pk_test_') && !PUBLISHABLE_KEY.startsWith('pk_live_')) {
+  throw new Error('Invalid Clerk Publishable Key format. Must start with pk_test_ or pk_live_')
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ClerkProvider 

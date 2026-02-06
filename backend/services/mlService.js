@@ -157,9 +157,58 @@ async function getServiceInfo() {
   }
 }
 
+/**
+ * Classify multiple emails with email IDs (wrapper for batch prediction)
+ * Used by scan job to classify emails with ID tracking
+ * @param {Array<Object>} emailObjects - Array of {id, text} objects
+ * @returns {Promise<Array<Object>>} Array of {emailId, prediction, confidence, modelVersion}
+ */
+async function classifyEmails(emailObjects) {
+  try {
+    // Validate input
+    if (!Array.isArray(emailObjects)) {
+      throw new Error('emailObjects must be an array');
+    }
+
+    if (emailObjects.length === 0) {
+      return []; // Return empty array for empty input
+    }
+
+    // Extract texts for batch prediction
+    const texts = emailObjects.map((obj, index) => {
+      if (!obj || typeof obj !== 'object') {
+        throw new Error(`Email object at index ${index} is invalid`);
+      }
+      if (!obj.text || typeof obj.text !== 'string') {
+        throw new Error(`Email text at index ${index} is missing or invalid`);
+      }
+      return obj.text;
+    });
+
+    // Call batch prediction
+    const predictions = await predictEmailsBatch(texts);
+
+    // Map results back with email IDs
+    const results = emailObjects.map((obj, index) => ({
+      emailId: obj.id,
+      prediction: predictions[index].prediction,
+      confidence: predictions[index].confidence,
+      probabilities: predictions[index].probabilities,
+      modelVersion: '1.0' // Static version for now
+    }));
+
+    return results;
+
+  } catch (error) {
+    console.error('❌ Classify emails error:', error.message);
+    throw error;
+  }
+}
+
 module.exports = {
   predictEmail,
   predictEmailsBatch,
+  classifyEmails,
   checkHealth,
   getServiceInfo
 };

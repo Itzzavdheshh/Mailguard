@@ -109,10 +109,25 @@ class BatchPredictionResponse(BaseModel):
 @app.get("/health")
 async def health_check():
     """
-    Health check endpoint to verify service is running
-    Returns: Status message
+    Health check endpoint to verify service is running and model is loaded.
+    Used by Docker health checks and load balancers.
+    Returns: Status message with model status
+    Raises: HTTPException 503 if model is not loaded
     """
-    return {"status": "ok"}
+    model_status = predictor.get_model_status()
+    
+    # Critical: Service is only healthy if model is loaded
+    if not model_status["loaded"]:
+        raise HTTPException(
+            status_code=503,
+            detail="Service unavailable: Model not loaded"
+        )
+    
+    return {
+        "status": "ok",
+        "model_loaded": True,
+        "model_version": model_status.get("version", "unknown")
+    }
 
 
 # Root endpoint

@@ -34,7 +34,7 @@ services:
     networks:
       - mailguard-network
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongosh", "--username", "$${MONGO_ROOT_USERNAME:-admin}", "--password", "$${MONGO_ROOT_PASSWORD:-change_this_password}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -125,7 +125,8 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - mailguard-network
     healthcheck:

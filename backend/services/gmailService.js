@@ -1,5 +1,6 @@
 // Import Gmail OAuth configuration
 const { getGmailClient } = require('../config/googleOAuth');
+const User = require('../models/User');
 
 /**
  * Gmail Service
@@ -20,8 +21,23 @@ const fetchEmails = async (user, maxResults = 20, searchQuery = 'in:inbox') => {
       throw new Error('User has not connected Gmail. Please authenticate first.');
     }
 
-    // Create authenticated Gmail client
-    const gmail = getGmailClient(user.gmailAccessToken, user.gmailRefreshToken);
+    // Create authenticated Gmail client with token refresh callback
+    const gmail = getGmailClient(
+      user.gmailAccessToken, 
+      user.gmailRefreshToken,
+      async (newTokens) => {
+        // Save refreshed tokens to database
+        try {
+          await User.findByIdAndUpdate(user._id, {
+            gmailAccessToken: newTokens.accessToken,
+            gmailRefreshToken: newTokens.refreshToken
+          });
+          console.log(`✅ Updated refreshed tokens for user: ${user.email}`);
+        } catch (error) {
+          console.error('❌ Failed to save refreshed tokens:', error.message);
+        }
+      }
+    );
 
     console.log(`📧 Fetching up to ${maxResults} emails for user: ${user.email}`);
     console.log(`🔍 Using search query: "${searchQuery}"`);
@@ -300,7 +316,23 @@ const getGmailAddress = async (user) => {
       throw new Error('User has not connected Gmail');
     }
 
-    const gmail = getGmailClient(user.gmailAccessToken, user.gmailRefreshToken);
+    // Create authenticated Gmail client with token refresh callback
+    const gmail = getGmailClient(
+      user.gmailAccessToken, 
+      user.gmailRefreshToken,
+      async (newTokens) => {
+        // Save refreshed tokens to database
+        try {
+          await User.findByIdAndUpdate(user._id, {
+            gmailAccessToken: newTokens.accessToken,
+            gmailRefreshToken: newTokens.refreshToken
+          });
+          console.log(`✅ Updated refreshed tokens for user: ${user.email}`);
+        } catch (error) {
+          console.error('❌ Failed to save refreshed tokens:', error.message);
+        }
+      }
+    );
     
     const profile = await gmail.users.getProfile({
       userId: 'me'
@@ -334,7 +366,9 @@ const deleteEmail = async (gmailId, accessToken, refreshToken) => {
     console.log(`🗑️  Attempting to delete Gmail message: ${gmailId}`);
 
     // Create authenticated Gmail client
-    const gmail = getGmailClient(accessToken, refreshToken);
+    // Note: No token refresh callback for delete operations since we don't have user object
+    // Token refresh will be handled by other operations (fetch, etc.)
+    const gmail = getGmailClient(accessToken, refreshToken, null);
 
     // Delete the email using Gmail API
     // Note: This permanently deletes the email (not just trash)

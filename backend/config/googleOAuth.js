@@ -81,9 +81,10 @@ const getTokensFromCode = async (code) => {
  * Create authenticated Gmail client using stored tokens
  * @param {string} accessToken - User's access token
  * @param {string} refreshToken - User's refresh token
+ * @param {Function} onTokensRefreshed - Optional callback when tokens are auto-refreshed
  * @returns {gmail_v1.Gmail} Authenticated Gmail API client
  */
-const getGmailClient = (accessToken, refreshToken) => {
+const getGmailClient = (accessToken, refreshToken, onTokensRefreshed = null) => {
   const oauth2Client = createOAuth2Client();
 
   // Set credentials (tokens) on the OAuth2 client
@@ -91,6 +92,21 @@ const getGmailClient = (accessToken, refreshToken) => {
     access_token: accessToken,
     refresh_token: refreshToken
   });
+
+  // Listen for token refresh events
+  // When access token expires, googleapis automatically refreshes it using refresh_token
+  // We need to capture the new tokens and update the database
+  if (onTokensRefreshed) {
+    oauth2Client.on('tokens', (tokens) => {
+      console.log('🔄 Gmail tokens auto-refreshed');
+      
+      // Call the callback with new tokens so they can be saved to database
+      onTokensRefreshed({
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token || refreshToken // Use new refresh_token if provided, else keep old one
+      });
+    });
+  }
 
   // Create and return Gmail API client
   const gmail = google.gmail({ version: 'v1', auth: oauth2Client });

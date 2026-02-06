@@ -7,6 +7,7 @@ const validateEnv = () => {
     'CLERK_SECRET_KEY',
     'GOOGLE_CLIENT_ID',
     'GOOGLE_CLIENT_SECRET',
+    'GOOGLE_REDIRECT_URI',
     'ML_SERVICE_URL'
   ];
 
@@ -31,6 +32,10 @@ const validateEnv = () => {
 
   if (process.env.ML_SERVICE_URL && !process.env.ML_SERVICE_URL.startsWith('http')) {
     warnings.push('ML_SERVICE_URL should start with http:// or https://');
+  }
+
+  if (process.env.GOOGLE_REDIRECT_URI && !process.env.GOOGLE_REDIRECT_URI.startsWith('http')) {
+    warnings.push('GOOGLE_REDIRECT_URI should start with http:// or https://');
   }
 
   // Warn if FRONTEND_URL not set (will default to localhost:3000)

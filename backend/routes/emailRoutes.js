@@ -7,6 +7,7 @@ const emailController = require('../controllers/emailController');
 const authMiddleware = require('../middleware/authMiddleware');
 const syncUserMiddleware = require('../middleware/syncUserMiddleware');
 const { validate, schemas } = require('../middleware/validation');
+const { cacheMiddleware } = require('../middleware/cache');
 
 // All email routes require authentication and user sync
 router.use(authMiddleware);
@@ -15,8 +16,8 @@ router.use(syncUserMiddleware);
 // Classify all unclassified emails
 router.post('/classify', emailController.classifyEmails);
 
-// Get classification statistics
-router.get('/stats', emailController.getClassificationStats);
+// Get classification statistics (cached for 30s)
+router.get('/stats', cacheMiddleware(30), emailController.getClassificationStats);
 
 // Get all emails (alias for /classified for backward compatibility)
 router.get('/', emailController.getClassifiedEmails);

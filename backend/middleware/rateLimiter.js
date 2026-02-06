@@ -57,8 +57,80 @@ const gmailFetchLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+/**
+ * ML classification rate limiter
+ * Protects ML service from overload
+ * Allows 30 classification requests per 15 minutes per IP
+ */
+const classifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30, // Limit to 30 classification requests per 15 minutes
+  message: {
+    success: false,
+    message: 'Classification rate limit exceeded. Please try again later.',
+    retryAfter: '15 minutes'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * Bulk/destructive operations rate limiter
+ * Prevents abuse of bulk delete and clean operations
+ * Allows 5 bulk operations per hour per IP
+ */
+const bulkOperationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5, // Limit to 5 bulk operations per hour
+  message: {
+    success: false,
+    message: 'Bulk operation rate limit exceeded. Please try again later.',
+    retryAfter: '1 hour'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * Admin operations rate limiter
+ * Extremely restrictive for expensive admin operations
+ * Allows 2 admin operations per day per IP
+ */
+const adminOperationLimiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000, // 24 hours (1 day)
+  max: 2, // Limit to 2 admin operations per day
+  message: {
+    success: false,
+    message: 'Admin operation rate limit exceeded. Only 2 operations allowed per day.',
+    retryAfter: '24 hours'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * Feedback submission rate limiter
+ * Prevents feedback spam and training data poisoning
+ * Allows 20 feedback submissions per hour per IP
+ */
+const feedbackLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 20, // Limit to 20 feedback submissions per hour
+  message: {
+    success: false,
+    message: 'Feedback submission rate limit exceeded. Please try again later.',
+    retryAfter: '1 hour'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 module.exports = {
   apiLimiter,
   strictLimiter,
-  gmailFetchLimiter
+  gmailFetchLimiter,
+  classifyLimiter,
+  bulkOperationLimiter,
+  adminOperationLimiter,
+  feedbackLimiter
 };

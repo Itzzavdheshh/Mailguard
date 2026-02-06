@@ -8,6 +8,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const syncUserMiddleware = require('../middleware/syncUserMiddleware');
 const adminAuth = require('../middleware/adminAuth');
 const { validate, schemas } = require('../middleware/validation');
+const { adminOperationLimiter } = require('../middleware/rateLimiter');
 
 // All admin routes require authentication, user sync, AND admin role
 router.use(authMiddleware);
@@ -23,7 +24,7 @@ router.use(adminAuth); // Verify admin role for ALL admin routes
  *   modelType: "random_forest" or "logistic"
  * }
  */
-router.post('/retrain', validate(schemas.retrain), adminController.triggerRetraining);
+router.post('/retrain', adminOperationLimiter, validate(schemas.retrain), adminController.triggerRetraining);
 
 /**
  * GET /api/admin/retrain/status
@@ -39,6 +40,6 @@ router.get('/retrain/status', adminController.getRetrainingStatus);
  *   outputFile: "training.csv"
  * }
  */
-router.post('/dataset/build', validate(schemas.datasetBuild), adminController.buildDataset);
+router.post('/dataset/build', adminOperationLimiter, validate(schemas.datasetBuild), adminController.buildDataset);
 
 module.exports = router;

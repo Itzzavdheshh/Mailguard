@@ -23,7 +23,7 @@ router.post('/', validate(schemas.feedback), feedbackController.submitFeedback);
  * GET /api/feedback
  * Get all feedback submitted by the current user
  */
-router.get('/', feedbackController.getUserFeedback);
+router.get('/', validate(schemas.emailQuery, 'query'), feedbackController.getUserFeedback);
 
 /**
  * GET /api/feedback/stats
@@ -35,6 +35,6 @@ router.get('/stats', feedbackController.getFeedbackStats);
  * DELETE /api/feedback/:id
  * Delete a specific feedback entry
  */
-router.delete('/:id', feedbackController.deleteFeedback);
+router.delete('/:id', validate(schemas.idParam, 'params'), feedbackController.deleteFeedback);
 
 module.exports = router;

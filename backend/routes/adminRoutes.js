@@ -6,6 +6,7 @@ const router = express.Router();
 const adminController = require('../controllers/adminController');
 const authMiddleware = require('../middleware/authMiddleware');
 const syncUserMiddleware = require('../middleware/syncUserMiddleware');
+const { validate, schemas } = require('../middleware/validation');
 
 // All admin routes require authentication and user sync
 // In production, add additional admin role check
@@ -21,7 +22,7 @@ router.use(syncUserMiddleware);
  *   modelType: "random_forest" or "logistic"
  * }
  */
-router.post('/retrain', adminController.triggerRetraining);
+router.post('/retrain', validate(schemas.retrain), adminController.triggerRetraining);
 
 /**
  * GET /api/admin/retrain/status
@@ -37,6 +38,6 @@ router.get('/retrain/status', adminController.getRetrainingStatus);
  *   outputFile: "training.csv"
  * }
  */
-router.post('/dataset/build', adminController.buildDataset);
+router.post('/dataset/build', validate(schemas.datasetBuild), adminController.buildDataset);
 
 module.exports = router;

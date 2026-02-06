@@ -14,19 +14,19 @@ router.use(authMiddleware);
 router.use(syncUserMiddleware);
 
 // Classify all unclassified emails
-router.post('/classify', emailController.classifyEmails);
+router.post('/classify', validate(schemas.classifyEmails), emailController.classifyEmails);
 
 // Get classification statistics (cached for 30s)
 router.get('/stats', cacheMiddleware(30), emailController.getClassificationStats);
 
 // Get all emails (alias for /classified for backward compatibility)
-router.get('/', emailController.getClassifiedEmails);
+router.get('/', validate(schemas.emailQuery, 'query'), emailController.getClassifiedEmails);
 
 // Get classified emails
 router.get('/classified', validate(schemas.emailQuery, 'query'), emailController.getClassifiedEmails);
 
 // Delete a single email
-router.delete('/:id', emailController.deleteEmail);
+router.delete('/:id', validate(schemas.idParam, 'params'), emailController.deleteEmail);
 
 // Bulk delete multiple emails
 router.post('/bulk-delete', validate(schemas.bulkOperation), emailController.bulkDeleteEmails);

@@ -13,6 +13,35 @@ const { startScanJob } = require('./jobs/scanJob');
 // Load environment variables from .env file
 dotenv.config();
 
+// ================================================
+// GLOBAL ERROR HANDLERS (Critical for Production)
+// ================================================
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ UNCAUGHT EXCEPTION! Shutting down gracefully...');
+  console.error('Error:', error.name);
+  console.error('Message:', error.message);
+  console.error('Stack:', error.stack);
+  
+  // Give server time to finish pending requests
+  setTimeout(() => {
+    process.exit(1);
+  }, 1000);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ UNHANDLED REJECTION! Shutting down gracefully...');
+  console.error('Promise:', promise);
+  console.error('Reason:', reason);
+  
+  // Give server time to finish pending requests
+  setTimeout(() => {
+    process.exit(1);
+  }, 1000);
+});
+
 // Validate environment variables before proceeding
 validateEnv();
 

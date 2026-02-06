@@ -1,5 +1,6 @@
 // Import mongoose for schema creation
 const mongoose = require('mongoose');
+const { encrypt, decrypt } = require('../utils/encryption');
 
 /**
  * User Schema Definition
@@ -68,6 +69,51 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+/**
+ * Pre-save hook: Encrypt Gmail refresh token before saving to database
+ */
+userSchema.pre('save', function (next) {
+  try {
+    // Only encrypt if gmailRefreshToken is modified and not null
+    if (this.isModified('gmailRefreshToken') && this.gmailRefreshToken) {
+      // Check if already encrypted (contains ':' delimiters)
+      if (!this.gmailRefreshToken.includes(':')) {
+        this.gmailRefreshToken = encrypt(this.gmailRefreshToken);
+      }
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * Post-find hook: Decrypt Gmail refresh token after retrieval
+ * Applied to find, findOne, findById operations
+ */
+const decryptRefreshToken = function (doc) {
+  if (doc && doc.gmailRefreshToken) {
+    try {
+      // Only decrypt if it appears encrypted (has ':' delimiters)
+      if (doc.gmailRefreshToken.includes(':')) {
+        doc.gmailRefreshToken = decrypt(doc.gmailRefreshToken);
+      }
+    } catch (error) {
+      console.error('❌ Failed to decrypt refresh token:', error.message);
+      doc.gmailRefreshToken = null; // Clear corrupted token
+    }
+  }
+};
+
+userSchema.post('find', function (docs) {
+  if (Array.isArray(docs)) {
+    docs.forEach(decryptRefreshToken);
+  }
+});
+
+userSchema.post('findOne', decryptRefreshToken);
+userSchema.post('findById', decryptRefreshToken);
 
 /**
  * Create and export User model

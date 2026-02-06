@@ -161,6 +161,7 @@ function Dashboard() {
     } catch (err) {
       console.error('❌ Failed to load emails:', err)
       setEmails([])
+      toast.error('Failed to load emails. Please try refreshing the page.')
     } finally {
       setEmailsLoading(false)
     }
@@ -177,6 +178,8 @@ function Dashboard() {
       setGmailConnected(data.data?.gmailConnected || false)
     } catch (err) {
       console.error('❌ Failed to check Gmail status:', err)
+      setGmailConnected(false)
+      // Don't show toast for this - it's checked on load and shouldn't be intrusive
     }
   }
 
@@ -188,6 +191,8 @@ function Dashboard() {
       if (response.needsMigration) {
         console.log('⚠️ Migration needed:', response.emailCounts.otherUsers, 'emails')
       }
+      setMigrationNeeded(false)
+      // Don't show toast for this - it's checked on load and shouldn't be intrusive
     } catch (err) {
       console.error('❌ Failed to check migration status:', err)
     }

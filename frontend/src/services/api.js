@@ -25,16 +25,40 @@ api.interceptors.request.use(
     try {
       // Get Clerk instance to access the session
       const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-      if (clerkPublishableKey && window.Clerk) {
-        const token = await window.Clerk.session?.getToken()
-        
-        // If token exists, add to Authorization header
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`
-        }
+      
+      // Check if Clerk is configured
+      if (!clerkPublishableKey) {
+        console.warn('⚠️  Clerk not configured - requests will fail authentication')
+        return config
+      }
+      
+      // Wait for Clerk to be loaded (with timeout)
+      let waitAttempts = 0
+      while (!window.Clerk && waitAttempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100)) // Wait 100ms
+        waitAttempts++
+      }
+      
+      // Check if Clerk loaded successfully
+      if (!window.Clerk) {
+        console.error('❌ Clerk failed to load after 5 seconds')
+        console.warn('⚠️  Request will be sent without authentication token')
+        return config
+      }
+      
+      // Get session token
+      const token = await window.Clerk.session?.getToken()
+      
+      // If token exists, add to Authorization header
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+        console.log('✅ Auth token added to request')
+      } else {
+        console.warn('⚠️  No Clerk session token available - user may not be authenticated')
       }
     } catch (error) {
-      console.error('Failed to get Clerk token:', error)
+      console.error('❌ Failed to get Clerk token:', error)
+      console.warn('⚠️  Request will proceed without authentication')
     }
     
     console.log('🚀 API Request:', config.method.toUpperCase(), config.url)

@@ -4,6 +4,7 @@
  */
 
 import { Card, CardContent } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
 export default function StatsCard({ 
@@ -21,10 +22,12 @@ export default function StatsCard({
     return (
       <Card className={cn("overflow-hidden", className)}>
         <CardContent className="p-6">
-          <div className="animate-pulse">
-            <div className="h-10 w-10 bg-gray-200 rounded-lg mb-4"></div>
-            <div className="h-8 bg-gray-200 rounded w-20 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-24"></div>
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-10 rounded-lg" />
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-4 w-24" />
+            </div>
           </div>
         </CardContent>
       </Card>

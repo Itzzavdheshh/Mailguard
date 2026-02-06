@@ -46,7 +46,16 @@ class DatasetBuilder:
             'MONGODB_URI', 
             'mongodb://localhost:27017/mailguard'
         )
-        self.output_file = output_file
+        
+        # Support Docker volume paths via DATASET_DIR environment variable
+        dataset_dir = os.getenv('DATASET_DIR', '.')
+        
+        # Resolve output file path (use dataset_dir if relative path)
+        if not os.path.isabs(output_file):
+            self.output_file = os.path.join(dataset_dir, output_file)
+        else:
+            self.output_file = output_file
+            
         self.client = None
         self.db = None
         

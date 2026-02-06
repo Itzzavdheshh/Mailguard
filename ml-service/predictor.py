@@ -18,10 +18,15 @@ model = None
 model_loaded = False
 model_metadata = None  # NEW: Store model metadata
 
+# Model directory configuration (supports Docker volumes)
+# In Docker: MODEL_DIR=/app/models (persisted volume)
+# Local dev: MODEL_DIR not set (uses current directory)
+MODEL_DIR = os.getenv('MODEL_DIR', os.path.dirname(__file__))
+
 # Model file paths
-VECTORIZER_PATH = os.path.join(os.path.dirname(__file__), "vectorizer.pkl")
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "phishing_model.pkl")
-METADATA_PATH = os.path.join(os.path.dirname(__file__), "model_metadata.json")  # NEW
+VECTORIZER_PATH = os.path.join(MODEL_DIR, "vectorizer.pkl")
+MODEL_PATH = os.path.join(MODEL_DIR, "phishing_model.pkl")
+METADATA_PATH = os.path.join(MODEL_DIR, "model_metadata.json")
 
 
 def load_models():

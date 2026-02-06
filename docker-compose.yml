@@ -49,6 +49,10 @@ services:
       dockerfile: Dockerfile
     container_name: mailguard-ml
     restart: unless-stopped
+    environment:
+      # Configure paths for volume persistence
+      - MODEL_DIR=/app/models
+      - DATASET_DIR=/app/datasets
     ports:
       - "8000:8000"
     volumes:

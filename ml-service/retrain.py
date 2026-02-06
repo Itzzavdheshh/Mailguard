@@ -56,13 +56,23 @@ class ModelRetrainer:
             model_type: 'random_forest' or 'logistic'
             test_size: Proportion of data for testing (0.0-1.0)
         """
-        self.data_file = data_file
+        # Support Docker volume paths via environment variables
+        model_dir = os.getenv('MODEL_DIR', '.')
+        dataset_dir = os.getenv('DATASET_DIR', '.')
+        
+        # Resolve data file path (use dataset_dir if relative path)
+        if not os.path.isabs(data_file):
+            self.data_file = os.path.join(dataset_dir, data_file)
+        else:
+            self.data_file = data_file
+            
         self.model_type = model_type
         self.test_size = test_size
         
-        # Model paths
-        self.vectorizer_path = 'vectorizer.pkl'
-        self.model_path = 'phishing_model.pkl'
+        # Model paths (save to MODEL_DIR for Docker volume persistence)
+        self.vectorizer_path = os.path.join(model_dir, 'vectorizer.pkl')
+        self.model_path = os.path.join(model_dir, 'phishing_model.pkl')
+        self.metadata_path = os.path.join(model_dir, 'model_metadata.json')
         
         # Data placeholders
         self.X_train = None
@@ -404,8 +414,7 @@ class ModelRetrainer:
             print(f"SUCCESS: Model saved ({model_size:.1f} KB)")
             
             # NEW: Save metadata
-            metadata_path = 'model_metadata.json'
-            print(f"\nSaving metadata to: {metadata_path}")
+            print(f"\nSaving metadata to: {self.metadata_path}")
             
             # Generate version from timestamp
             version = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -428,10 +437,10 @@ class ModelRetrainer:
             
             # Write metadata JSON
             import json
-            with open(metadata_path, 'w') as f:
+            with open(self.metadata_path, 'w') as f:
                 json.dump(metadata, f, indent=2)
             
-            metadata_size = os.path.getsize(metadata_path) / 1024  # KB
+            metadata_size = os.path.getsize(self.metadata_path) / 1024  # KB
             print(f"SUCCESS: Metadata saved ({metadata_size:.1f} KB)")
             print(f"  Version: {version}")
             if metrics:

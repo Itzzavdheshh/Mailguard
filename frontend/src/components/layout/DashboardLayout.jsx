@@ -13,20 +13,20 @@ export default function DashboardLayout({ children }) {
   const displayName = user?.fullName || user?.primaryEmailAddress?.emailAddress || 'User'
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white">
       {/* Top Header Bar */}
-      <header className="h-16 border-b border-slate-700 bg-slate-800">
+      <header className="h-16 border-b border-gray-200 bg-white shadow-sm">
         <div className="h-full flex items-center justify-between px-4 sm:px-6 max-w-[1920px] mx-auto">
           {/* Left side - Branding */}
           <div className="flex items-center gap-2">
             <Logo className="w-8 h-8" showText={false} />
-            <span className="font-bold text-xl text-slate-100">Mailguard</span>
+            <span className="font-bold text-xl text-gray-900">Mailguard</span>
           </div>
 
           {/* Right side - User actions */}
           <div className="flex items-center gap-4">
             {/* Notifications */}
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative text-gray-700 hover:text-gray-900 hover:bg-gray-100">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
             </Button>
@@ -38,7 +38,7 @@ export default function DashboardLayout({ children }) {
       </header>
 
       {/* Main content */}
-      <main className="p-4 sm:p-6 max-w-[1920px] mx-auto">
+      <main className="p-4 sm:p-6 max-w-[1920px] mx-auto bg-gray-50">
         {children}
       </main>
     </div>

@@ -38,7 +38,11 @@ export default function DashboardLayout({ children }) {
                 elements: {
                   avatarBox: "w-8 h-8",
                   userButtonAvatarBox: "w-8 h-8",
-                  userButtonTrigger: "focus:shadow-none"
+                  userButtonTrigger: "focus:shadow-none",
+                  userButtonPopoverCard: "bg-slate-800 border border-slate-700",
+                  userButtonPopoverActionButton: "text-slate-100 hover:bg-slate-700",
+                  userButtonPopoverActionButtonText: "text-slate-100",
+                  userButtonPopoverFooter: "hidden"
                 },
                 variables: {
                   colorPrimary: "#3b82f6",

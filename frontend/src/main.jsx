@@ -34,7 +34,7 @@ function DarkModeApp() {
   return (
     <ErrorBoundary>
       <App />
-      <Toaster position="top-right" richColors closeButton />
+      <Toaster position="top-right" richColors closeButton expand visibleToasts={5} />
     </ErrorBoundary>
   )
 }

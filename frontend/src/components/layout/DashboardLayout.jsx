@@ -20,8 +20,8 @@ export default function DashboardLayout({ children }) {
         {/* Header */}
         <Header onMenuClick={() => setMobileMenuOpen(true)} />
 
-        {/* Page content - add top padding to prevent overlap with header */}
-        <main className="p-4 sm:p-6 pt-4">
+        {/* Page content */}
+        <main className="p-4 sm:p-6">
           {children}
         </main>
       </div>

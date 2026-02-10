@@ -529,11 +529,10 @@ function Dashboard() {
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Migration Warning Banner */}
       {migrationNeeded && (
-        <div className="mb-6 bg-yellow-50 rounded-xl border border-yellow-200 p-6">
-          <div className="flex items-center justify-between">
+        <div className="bg-yellow-50 rounded-xl border border-yellow-200 p-6">\n          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="p-3 bg-yellow-100 rounded-lg">
                 <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -578,7 +577,7 @@ function Dashboard() {
       )}
 
       {/* Welcome Section */}
-      <div className="mb-6 sm:mb-8">
+      <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 mb-2">
           Welcome back, {displayName}! 👋
         </h1>
@@ -588,7 +587,7 @@ function Dashboard() {
       </div>
         
         {/* Gmail Connection Section */}
-        <div className="mb-8 bg-slate-800 rounded-xl border border-slate-700 p-4 sm:p-6 transition-all duration-300 hover:border-slate-600 hover:shadow-lg hover:shadow-blue-500/5">
+        <div className="bg-slate-800 rounded-xl border border-slate-700 p-4 sm:p-6 transition-all duration-300 hover:border-slate-600 hover:shadow-lg hover:shadow-blue-500/5">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-3 sm:space-x-4">
               <div className="p-2 sm:p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 flex-shrink-0">
@@ -770,7 +769,7 @@ function Dashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatsCard
             title="Total Emails"
             value={stats.total}
@@ -810,7 +809,7 @@ function Dashboard() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl backdrop-blur-sm">
+          <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl backdrop-blur-sm">
             <p className="text-rose-400 text-sm">{error}</p>
           </div>
         )}
@@ -821,7 +820,7 @@ function Dashboard() {
         </Suspense>
 
         {/* Filters and Search Section */}
-        <div className="mb-6 bg-slate-800 rounded-xl border border-slate-700 p-6 transition-all duration-300 hover:border-slate-600">
+        <div className="bg-slate-800 rounded-xl border border-slate-700 p-6 transition-all duration-300 hover:border-slate-600">
           <h3 className="text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
             <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -985,7 +984,7 @@ function Dashboard() {
         </div>
 
         {/* Action Buttons */}
-        <div className="mb-6 flex flex-wrap gap-3 sm:gap-4">
+        <div className="flex flex-wrap gap-3 sm:gap-4">
           {/* Bulk Delete Button */}
           <button
             onClick={handleBulkDelete}

@@ -579,33 +579,33 @@ function Dashboard() {
 
       {/* Welcome Section */}
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 mb-2">
           Welcome back, {displayName}! 👋
         </h1>
-        <p className="text-sm sm:text-base text-gray-600">
+        <p className="text-sm sm:text-base text-slate-400">
           Here's your email security overview
         </p>
       </div>
         
         {/* Gmail Connection Section */}
-        <div className="mb-8 bg-gray-900/40 backdrop-blur-sm rounded-xl border border-gray-700 p-4 sm:p-6">
+        <div className="mb-8 bg-slate-800 rounded-xl border border-slate-700 p-4 sm:p-6 transition-all duration-300 hover:border-slate-600 hover:shadow-lg hover:shadow-blue-500/5">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-3 sm:space-x-4">
-              <div className="p-2 sm:p-3 bg-gray-800 rounded-lg border border-gray-700 flex-shrink-0">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+              <div className="p-2 sm:p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 flex-shrink-0">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
                 </svg>
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-lg sm:text-xl font-semibold text-white">Gmail Integration</h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-slate-100">Gmail Integration</h3>
                   {gmailConnected && (
-                    <span className="px-2 sm:px-3 py-1 bg-green-600/20 border border-green-500/50 rounded-full text-xs text-green-300 font-semibold">
+                    <span className="px-2 sm:px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-xs text-emerald-400 font-semibold">
                       ✓ Connected
                     </span>
                   )}
                 </div>
-                <p className="text-xs sm:text-sm text-gray-300">
+                <p className="text-xs sm:text-sm text-slate-400">
                   {gmailConnected ? 'Fetch and scan your emails for phishing threats' : 'Connect your Gmail to scan and protect your inbox'}
                 </p>
               </div>
@@ -614,7 +614,7 @@ function Dashboard() {
               {!gmailConnected ? (
                 <button
                   onClick={handleConnectGmail}
-                  className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200 flex items-center justify-center space-x-2 min-h-[44px] text-sm sm:text-base"
+                  className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 min-h-[44px] text-sm sm:text-base shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -625,7 +625,7 @@ function Dashboard() {
                 <>
                   <button
                     onClick={() => setShowFetchOptions(!showFetchOptions)}
-                    className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition duration-200 flex items-center justify-center space-x-2 min-h-[44px] text-sm sm:text-base"
+                    className="flex-1 sm:flex-none px-4 sm:px-6 py-3 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 min-h-[44px] text-sm sm:text-base border border-slate-600"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
@@ -635,10 +635,10 @@ function Dashboard() {
                   <button
                     onClick={handleFetchEmails}
                     disabled={fetchingEmails}
-                    className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center justify-center space-x-2 min-h-[44px] text-sm sm:text-base ${
+                    className={`flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 min-h-[44px] text-sm sm:text-base ${
                       fetchingEmails
-                        ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                        : 'bg-green-600 hover:bg-green-700 text-white'
+                        ? 'bg-slate-700 text-slate-400 cursor-not-allowed border border-slate-600'
+                        : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20 hover:shadow-emerald-500/30'
                     }`}
                   >
                     {fetchingEmails ? (
@@ -667,25 +667,25 @@ function Dashboard() {
           
           {/* Gmail Fetch Options Dialog */}
           {showFetchOptions && gmailConnected && (
-            <div className="mt-4 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-              <h4 className="text-lg font-semibold text-white mb-4">Gmail Fetch Options</h4>
+            <div className="mt-4 p-4 bg-slate-900/80 border border-slate-700 rounded-xl">
+              <h4 className="text-lg font-semibold text-slate-100 mb-4">Gmail Fetch Options</h4>
               
-              <div className="mb-4 flex items-center space-x-3 p-3 bg-gray-900/50 rounded-lg border border-gray-700">
+              <div className="mb-4 flex items-center space-x-3 p-3 bg-slate-800 rounded-lg border border-slate-700">
                 <input
                   type="checkbox"
                   id="fetchAll"
                   checked={gmailFetchOptions.fetchAll || false}
                   onChange={(e) => setGmailFetchOptions({ ...gmailFetchOptions, fetchAll: e.target.checked })}
-                  className="w-5 h-5 rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-blue-500"
                 />
-                <label htmlFor="fetchAll" className="text-sm font-medium text-white cursor-pointer">
+                <label htmlFor="fetchAll" className="text-sm font-medium text-slate-100 cursor-pointer">
                   Fetch All Emails (No Limit) - ⚠️ This may take a while
                 </label>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="block text-sm font-medium text-slate-400 mb-2">
                     Number of Emails {gmailFetchOptions.fetchAll ? '(Ignored when Fetch All is checked)' : '(1-100)'}
                   </label>
                   <input
@@ -695,12 +695,12 @@ function Dashboard() {
                     value={gmailFetchOptions.maxResults}
                     onChange={(e) => setGmailFetchOptions({ ...gmailFetchOptions, maxResults: parseInt(e.target.value) || 50 })}
                     disabled={gmailFetchOptions.fetchAll}
-                    className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="block text-sm font-medium text-slate-400 mb-2">
                     Gmail Search Query (optional)
                   </label>
                   <input
@@ -708,31 +708,31 @@ function Dashboard() {
                     placeholder="e.g., is:unread, has:attachment"
                     value={gmailFetchOptions.query}
                     onChange={(e) => setGmailFetchOptions({ ...gmailFetchOptions, query: e.target.value })}
-                    className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                    className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="block text-sm font-medium text-slate-400 mb-2">
                     From Date
                   </label>
                   <input
                     type="date"
                     value={gmailFetchOptions.dateFrom}
                     onChange={(e) => setGmailFetchOptions({ ...gmailFetchOptions, dateFrom: e.target.value })}
-                    className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-blue-500"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="block text-sm font-medium text-slate-400 mb-2">
                     To Date
                   </label>
                   <input
                     type="date"
                     value={gmailFetchOptions.dateTo}
                     onChange={(e) => setGmailFetchOptions({ ...gmailFetchOptions, dateTo: e.target.value })}
-                    className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                    className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -741,23 +741,23 @@ function Dashboard() {
                 <button
                   onClick={handleFetchEmails}
                   disabled={fetchingEmails}
-                  className={`px-6 py-2 rounded-lg font-semibold transition duration-200 ${
+                  className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 ${
                     fetchingEmails
-                      ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                      : 'bg-green-600 hover:bg-green-700 text-white'
+                      ? 'bg-slate-700 text-slate-400 cursor-not-allowed border border-slate-600'
+                      : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/20'
                   }`}
                 >
                   Fetch with Options
                 </button>
                 <button
                   onClick={() => setShowFetchOptions(false)}
-                  className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-semibold transition duration-200"
+                  className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-lg font-semibold transition-all duration-200 border border-slate-600"
                 >
                   Cancel
                 </button>
               </div>
               
-              <div className="mt-3 text-xs text-gray-500">
+              <div className="mt-3 text-xs text-slate-500">
                 <p>💡 <strong>Tips:</strong></p>
                 <ul className="list-disc list-inside ml-2 mt-1 space-y-1">
                   <li>Search query examples: "from:example@gmail.com", "subject:invoice", "is:unread"</li>
@@ -810,8 +810,8 @@ function Dashboard() {
 
         {/* Error Message */}
         {error && (
-          <div className="mb-8 p-4 bg-red-500/10 border border-red-500/50 rounded-lg backdrop-blur-sm">
-            <p className="text-red-400 text-sm">{error}</p>
+          <div className="mb-8 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl backdrop-blur-sm">
+            <p className="text-rose-400 text-sm">{error}</p>
           </div>
         )}
 

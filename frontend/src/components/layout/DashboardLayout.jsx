@@ -35,20 +35,37 @@ export default function DashboardLayout({ children }) {
             <UserButton 
               afterSignOutUrl="/login"
               appearance={{
+                baseTheme: undefined,
                 elements: {
                   avatarBox: "w-8 h-8",
                   userButtonAvatarBox: "w-8 h-8",
                   userButtonTrigger: "focus:shadow-none",
-                  userButtonPopoverCard: "bg-slate-800 border border-slate-700",
-                  userButtonPopoverActionButton: "text-slate-100 hover:bg-slate-700",
-                  userButtonPopoverActionButtonText: "text-slate-100",
+                  userButtonPopoverCard: {
+                    backgroundColor: "#1e293b",
+                    border: "1px solid #334155",
+                    color: "#ffffff"
+                  },
+                  userButtonPopoverActionButton: {
+                    color: "#ffffff",
+                    "&:hover": {
+                      backgroundColor: "#334155"
+                    }
+                  },
+                  userButtonPopoverActionButtonText: {
+                    color: "#ffffff !important"
+                  },
+                  userButtonPopoverActionButtonIcon: {
+                    color: "#ffffff"
+                  },
                   userButtonPopoverFooter: "hidden"
                 },
                 variables: {
                   colorPrimary: "#3b82f6",
                   colorText: "#ffffff",
                   colorTextSecondary: "#cbd5e1",
-                  colorBackground: "#1e293b"
+                  colorBackground: "#1e293b",
+                  colorInputBackground: "#1e293b",
+                  colorInputText: "#ffffff"
                 }
               }}
             />

@@ -108,7 +108,8 @@ function Dashboard() {
     dateFrom: '',
     dateTo: '',
     query: '',
-    fetchAll: false
+    fetchAll: false,
+    timeRange: '5m' // NEW: Default to last 5 minutes for real-time
   })
   const [showFetchOptions, setShowFetchOptions] = useState(false)
 
@@ -699,6 +700,30 @@ function Dashboard() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-400 mb-2">
+                    ⏰ Time Range (Real-time Fetch)
+                  </label>
+                  <select
+                    value={gmailFetchOptions.timeRange}
+                    onChange={(e) => setGmailFetchOptions({ ...gmailFetchOptions, timeRange: e.target.value })}
+                    className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-blue-500"
+                  >
+                    <option value="5m">⚡ Last 5 Minutes</option>
+                    <option value="15m">🕐 Last 15 Minutes</option>
+                    <option value="30m">🕑 Last 30 Minutes</option>
+                    <option value="1h">🕓 Last 1 Hour</option>
+                    <option value="6h">🕕 Last 6 Hours</option>
+                    <option value="12h">🕛 Last 12 Hours</option>
+                    <option value="1d">📅 Last 1 Day</option>
+                    <option value="3d">📅 Last 3 Days</option>
+                    <option value="7d">📅 Last 7 Days</option>
+                    <option value="30d">📅 Last 30 Days</option>
+                    <option value="all">📬 All Inbox Emails</option>
+                  </select>
+                  <p className="mt-1 text-xs text-slate-500">Time range filters are ignored if you set custom dates below</p>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">
                     Number of Emails {gmailFetchOptions.fetchAll ? '(Ignored when Fetch All is checked)' : '(1-100)'}
                   </label>
                   <input
@@ -711,8 +736,10 @@ function Dashboard() {
                     className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                 </div>
-                
-                <div>
+              
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                   <label className="block text-sm font-medium text-slate-400 mb-2">
                     Gmail Search Query (optional)
                   </label>

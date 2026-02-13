@@ -147,20 +147,54 @@ function EmailRow({ email, onDelete, onFeedback, isSelected, onSelect }) {
     const prediction = email.prediction?.toLowerCase() || 'unknown'
     
     if (prediction === 'phishing') {
-      return <Badge variant="danger">🚨 Phishing</Badge>
+      return (
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/20 border border-rose-500/50 text-rose-300 font-semibold text-sm shadow-sm">
+          <span className="text-base">🚨</span>
+          <span>Phishing</span>
+        </div>
+      )
     } else if (prediction === 'safe' || prediction === 'legitimate') {
-      return <Badge variant="success">✅ Safe</Badge>
+      return (
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-semibold text-sm shadow-sm">
+          <span className="text-base">✅</span>
+          <span>Safe</span>
+        </div>
+      )
     } else if (prediction === 'pending') {
-      return <Badge variant="warning">⏳ Pending</Badge>
+      return (
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/50 text-amber-300 font-semibold text-sm shadow-sm">
+          <span className="text-base">⏳</span>
+          <span>Pending</span>
+        </div>
+      )
     } else {
-      return <Badge variant="secondary">❓ Unknown</Badge>
+      return (
+        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-500/20 border border-slate-500/50 text-slate-300 font-semibold text-sm shadow-sm">
+          <span className="text-base">❓</span>
+          <span>Unknown</span>
+        </div>
+      )
     }
   }
 
-  // Format confidence percentage
+  // Format confidence percentage with color coding
   const getConfidence = () => {
     const confidence = email.confidence || 0
-    return `${(confidence * 100).toFixed(1)}%`
+    const percentage = (confidence * 100).toFixed(1)
+    
+    // Color code based on confidence level
+    let colorClass = 'text-slate-400'
+    if (confidence >= 0.8) {
+      colorClass = 'text-emerald-400 font-bold'
+    } else if (confidence >= 0.6) {
+      colorClass = 'text-blue-400 font-semibold'
+    } else if (confidence >= 0.4) {
+      colorClass = 'text-amber-400 font-semibold'
+    } else {
+      colorClass = 'text-rose-400 font-semibold'
+    }
+    
+    return <span className={`${colorClass} text-sm`}>{percentage}%</span>
   }
 
   // Truncate long text
@@ -212,39 +246,42 @@ function EmailRow({ email, onDelete, onFeedback, isSelected, onSelect }) {
       
       {/* Actions Column */}
       <TableCell className="text-right">
-        <div className="flex items-center justify-end gap-1">
-          {/* Feedback: Correct */}
+        <div className="flex items-center justify-end gap-2">
+          {/* Feedback: Correct - More prominent with border and better colors */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onFeedback(email._id, 'correct')}
-            className="h-8 w-8 p-0 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10"
-            title="Mark as Correct"
+            className="h-9 px-3 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/20 border border-emerald-500/30 hover:border-emerald-500/50 transition-all duration-200"
+            title="Mark as Correct ✓"
           >
-            <ThumbsUp className="h-4 w-4" />
+            <ThumbsUp className="h-4 w-4 mr-1" />
+            <span className="text-xs font-semibold">Correct</span>
           </Button>
           
-          {/* Feedback: Wrong */}
+          {/* Feedback: Wrong - More prominent with border and better colors */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => onFeedback(email._id, 'wrong')}
-            className="h-8 w-8 p-0 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
-            title="Mark as Wrong"
+            className="h-9 px-3 text-amber-400 hover:text-amber-300 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-500/50 transition-all duration-200"
+            title="Mark as Wrong ✗"
           >
-            <AlertTriangle className="h-4 w-4" />
+            <AlertTriangle className="h-4 w-4 mr-1" />
+            <span className="text-xs font-semibold">Wrong</span>
           </Button>
           
-          {/* Delete Button - Only show for phishing emails */}
+          {/* Delete Button - Only show for phishing emails, more prominent */}
           {email.prediction?.toLowerCase() === 'phishing' && (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => onDelete(email._id)}
-              className="h-8 w-8 p-0 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10"
-              title="Delete Email"
+              className="h-9 px-3 text-rose-400 hover:text-rose-300 hover:bg-rose-500/20 border border-rose-500/30 hover:border-rose-500/50 transition-all duration-200"
+              title="Delete Email 🗑️"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-4 w-4 mr-1" />
+              <span className="text-xs font-semibold">Delete</span>
             </Button>
           )}
         </div>

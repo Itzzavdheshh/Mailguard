@@ -36,15 +36,15 @@ export default function StatsCard({
 
   return (
     <Card className={cn(
-      "overflow-hidden bg-slate-800 border-slate-700 transition-all duration-300",
-      "hover:bg-slate-800/80 hover:border-slate-600 hover:shadow-xl hover:shadow-blue-500/10",
+      "overflow-hidden bg-slate-800 border-2 border-slate-700 transition-all duration-300",
+      "hover:bg-slate-800/80 hover:border-blue-500/50 hover:shadow-xl hover:shadow-blue-500/20",
       "group cursor-default",
       className
     )}>
       <CardContent className="p-6">
         {/* Icon */}
         <div className={cn(
-          "inline-flex p-3 rounded-xl mb-4 transition-transform duration-300 group-hover:scale-110",
+          "inline-flex p-3 rounded-xl mb-4 transition-all duration-300 group-hover:scale-110 border border-opacity-30",
           iconBgColor
         )}>
           <Icon className={cn("w-6 h-6", iconColor)} />
@@ -52,7 +52,7 @@ export default function StatsCard({
 
         {/* Value */}
         <div className="space-y-1">
-          <h3 className="text-3xl font-bold text-slate-100 tracking-tight">
+          <h3 className="text-4xl font-bold text-slate-100 tracking-tight">
             {value}
           </h3>
           <p className="text-sm text-slate-400 font-medium">

@@ -824,6 +824,7 @@ function Dashboard() {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
                   <label className="block text-sm font-medium text-slate-400 mb-2">
                     Gmail Search Query (optional)
                   </label>

@@ -603,27 +603,29 @@ function Dashboard() {
         
         {/* Gmail Connection Section */}
         <div className="bg-slate-800 rounded-xl border border-slate-700 p-4 sm:p-6 transition-all duration-300 hover:border-slate-600 hover:shadow-lg hover:shadow-blue-500/5">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center space-x-3 sm:space-x-4">
-              <div className="p-2 sm:p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 flex-shrink-0">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
-                </svg>
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-lg sm:text-xl font-semibold text-slate-100">Gmail Integration</h3>
-                  {gmailConnected && (
-                    <span className="px-2 sm:px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-xs text-emerald-400 font-semibold">
-                      ✓ Connected
-                    </span>
-                  )}
+          <div className="flex flex-col gap-4">
+            {/* Main Connection Info */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <div className="p-2 sm:p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 flex-shrink-0">
+                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
+                  </svg>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-400">
-                  {gmailConnected ? 'Fetch and scan your emails for phishing threats' : 'Connect your Gmail to scan and protect your inbox'}
-                </p>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-lg sm:text-xl font-semibold text-slate-100">Gmail Integration</h3>
+                    {gmailConnected && (
+                      <span className="px-2 sm:px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-xs text-emerald-400 font-semibold">
+                        ✓ Connected
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs sm:text-sm text-slate-400">
+                    {gmailConnected ? 'Fetch real-time emails and scan for phishing threats' : 'Connect your Gmail to scan and protect your inbox'}
+                  </p>
+                </div>
               </div>
-            </div>
             <div className="flex flex-wrap gap-2 sm:gap-4 w-full sm:w-auto">
               {!gmailConnected ? (
                 <button
@@ -678,6 +680,34 @@ function Dashboard() {
               )}
             </div>
           </div>
+          
+          {/* OLD EMAILS WARNING BANNER */}
+          {stats.total > 0 && (
+            <div className="mt-4 p-4 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-orange-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-semibold text-orange-300">Old Emails Detected</p>
+                    <p className="text-xs text-orange-400/80 mt-1">
+                      You have {stats.total} email(s) in database. Clear them to fetch fresh emails and start with a clean slate.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleClearAllEmails}
+                  className="flex-shrink-0 px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-semibold transition-all duration-200 text-sm shadow-lg shadow-orange-600/20 flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Clear All ({stats.total})
+                </button>
+              </div>
+            </div>
+          )}
           
           {/* Gmail Fetch Options Dialog */}
           {showFetchOptions && gmailConnected && (

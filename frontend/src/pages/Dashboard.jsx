@@ -611,7 +611,8 @@ function Dashboard() {
     <div className="space-y-6">
       {/* Migration Warning Banner */}
       {migrationNeeded && (
-        <div className="bg-yellow-50 rounded-xl border border-yellow-200 p-6">\n          <div className="flex items-center justify-between">
+        <div className="bg-yellow-50 rounded-xl border border-yellow-200 p-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="p-3 bg-yellow-100 rounded-lg">
                 <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

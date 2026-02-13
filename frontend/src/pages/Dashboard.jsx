@@ -893,6 +893,7 @@ function Dashboard() {
               </div>
             </div>
           )}
+          </div>
         </div>
 
         {/* Reinforcement Learning Section */}

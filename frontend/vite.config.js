@@ -47,13 +47,23 @@ export default defineConfig({
     // Chunk splitting for better caching
     rollupOptions: {
       output: {
-        manualChunks: {
+        manualChunks(id) {
           // Vendor chunks (external libraries)
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'clerk': ['@clerk/clerk-react'],
-          'ui-vendor': ['@radix-ui/react-alert-dialog', '@radix-ui/react-slot'],
-          'chart-vendor': ['recharts'],
-          'utils': ['axios', 'clsx', 'tailwind-merge', 'class-variance-authority'],
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+            return 'react-vendor';
+          }
+          if (id.includes('node_modules/@clerk/clerk-react')) {
+            return 'clerk';
+          }
+          if (id.includes('node_modules/@radix-ui')) {
+            return 'ui-vendor';
+          }
+          if (id.includes('node_modules/recharts')) {
+            return 'chart-vendor';
+          }
+          if (id.includes('node_modules/axios') || id.includes('node_modules/clsx') || id.includes('node_modules/tailwind-merge') || id.includes('node_modules/class-variance-authority')) {
+            return 'utils';
+          }
         },
         // Naming pattern for chunks
         chunkFileNames: 'assets/js/[name]-[hash].js',

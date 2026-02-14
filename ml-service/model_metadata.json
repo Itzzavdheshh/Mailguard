@@ -1,6 +1,6 @@
 {
-  "version": "20260214_175253",
-  "trained_at": "2026-02-14T17:52:53.081469",
+  "version": "20260214_180939",
+  "trained_at": "2026-02-14T18:09:39.362113",
   "model_type": "random_forest",
   "training_samples": 72,
   "test_samples": 18,

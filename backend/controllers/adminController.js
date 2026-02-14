@@ -137,6 +137,8 @@ exports.triggerRetraining = async (req, res) => {
       if (!reloadResponse.data.success) {
         throw new Error('Model reload returned non-success status');
       }
+      
+      console.log('✅ Model reloaded successfully in ML service');
     } catch (error) {
       return res.status(500).json({
         success: false,
@@ -147,21 +149,63 @@ exports.triggerRetraining = async (req, res) => {
       });
     }
     
+    // Step 5: Trigger automatic reclassification of all emails with new model
+    console.log('🔄 Triggering automatic reclassification of emails...');
+    let reclassifyStats = null;
+    try {
+      // Import Email model to check if user has emails
+      const Email = require('../models/Email');
+      const emailCount = await Email.countDocuments();
+      
+      if (emailCount > 0) {
+        // Trigger reclassification in background (don't wait for completion)
+        // This will use the newly loaded model
+        const emailController = require('./emailController');
+        
+        // Create mock request/response objects for internal call
+        const mockReq = {
+          mongoUserId: req.mongoUserId,
+          body: { forceReclassify: true }
+        };
+        
+        const mockRes = {
+          status: (code) => mockRes,
+          json: (data) => {
+            reclassifyStats = data.stats;
+            console.log(`✅ Reclassification triggered: ${data.stats?.processed || 0} emails will be processed`);
+            return mockRes;
+          }
+        };
+        
+        // Call classify in background (don't await - let it run async)
+        emailController.classifyEmails(mockReq, mockRes).catch(err => {
+          console.warn('⚠️  Background reclassification failed:', err.message);
+        });
+      } else {
+        console.log('ℹ️  No emails to reclassify (database empty)');
+      }
+    } catch (error) {
+      console.warn('⚠️  Could not trigger reclassification:', error.message);
+      // Don't fail the whole retraining if reclassification fails
+    }
+    
     // Success response
     console.log('\n✅ Complete retraining pipeline finished successfully!\n');
     
     return res.json({
       success: true,
-      message: 'Model retrained and reloaded successfully',
+      message: 'Model retrained, reloaded, and reclassification triggered successfully',
       steps: {
         datasetBuilding: 'completed',
         retraining: 'completed',
-        reload: 'completed'
+        reload: 'completed',
+        reclassification: reclassifyStats ? 'triggered' : 'skipped'
       },
       config: {
         dataFile: TRAINING_DATA,
         modelType: MODEL_TYPE
       },
+      reclassifyStats,
       timestamp: new Date().toISOString()
     });
     

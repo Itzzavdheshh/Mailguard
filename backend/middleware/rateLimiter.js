@@ -6,13 +6,17 @@
 
 const rateLimit = require('express-rate-limit');
 
+// Check if running in development mode
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 /**
  * General API rate limiter
- * Allows 100 requests per 15 minutes per IP
+ * Development: 1000 requests per 15 minutes per IP
+ * Production: 100 requests per 15 minutes per IP
  */
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: isDevelopment ? 1000 : 100, // Much higher limit in development
   message: {
     success: false,
     message: 'Too many requests from this IP, please try again later.',
@@ -26,11 +30,12 @@ const apiLimiter = rateLimit({
 
 /**
  * Strict rate limiter for authentication-heavy operations
- * Allows 20 requests per 15 minutes per IP
+ * Development: 200 requests per 15 minutes per IP
+ * Production: 20 requests per 15 minutes per IP
  */
 const strictLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // Limit each IP to 20 requests per windowMs
+  max: isDevelopment ? 200 : 20,
   message: {
     success: false,
     message: 'Too many attempts. Please try again later.',
@@ -43,11 +48,12 @@ const strictLimiter = rateLimit({
 /**
  * Gmail fetch rate limiter
  * More restrictive to prevent Gmail API quota exhaustion
- * Allows 10 fetch requests per hour per IP
+ * Development: 100 fetch requests per hour per IP
+ * Production: 10 fetch requests per hour per IP
  */
 const gmailFetchLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // Limit each IP to 10 fetch requests per hour
+  max: isDevelopment ? 100 : 10,
   message: {
     success: false,
     message: 'Gmail fetch rate limit exceeded. Please try again later.',
@@ -60,11 +66,12 @@ const gmailFetchLimiter = rateLimit({
 /**
  * ML classification rate limiter
  * Protects ML service from overload
- * Allows 30 classification requests per 15 minutes per IP
+ * Development: 300 classification requests per 15 minutes per IP
+ * Production: 30 classification requests per 15 minutes per IP
  */
 const classifyLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 30, // Limit to 30 classification requests per 15 minutes
+  max: isDevelopment ? 300 : 30,
   message: {
     success: false,
     message: 'Classification rate limit exceeded. Please try again later.',
@@ -94,11 +101,12 @@ const bulkOperationLimiter = rateLimit({
 /**
  * Admin operations rate limiter
  * Extremely restrictive for expensive admin operations
- * Allows 2 admin operations per day per IP
+ * Development: 20 admin operations per day per IP
+ * Production: 2 admin operations per day per IP
  */
 const adminOperationLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, // 24 hours (1 day)
-  max: 2, // Limit to 2 admin operations per day
+  max: isDevelopment ? 20 : 2,
   message: {
     success: false,
     message: 'Admin operation rate limit exceeded. Only 2 operations allowed per day.',

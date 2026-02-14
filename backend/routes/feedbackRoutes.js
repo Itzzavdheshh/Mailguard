@@ -18,12 +18,13 @@ router.use(syncUserMiddleware);
  * POST /api/feedback
  * Submit feedback on an email classification
  * Body: { emailId, correctLabel, notes? }
- * INVALIDATES: User cache after feedback submission (for retraining)
+ * INVALIDATES: User cache and feedback cache after feedback submission
  */
 router.post('/', 
   feedbackLimiter, 
   validate(schemas.feedback), 
   invalidateCacheMiddleware({ resource: 'stats' }), // Invalidate stats after feedback
+  invalidateCacheMiddleware({ resource: 'feedback' }), // Invalidate feedback list cache
   feedbackController.submitFeedback
 );
 
@@ -51,11 +52,12 @@ router.get('/stats',
 /**
  * DELETE /api/feedback/:id
  * Delete a specific feedback entry
- * INVALIDATES: User cache after deletion
+ * INVALIDATES: Stats and feedback cache after deletion
  */
 router.delete('/:id', 
   validate(schemas.idParam, 'params'), 
   invalidateCacheMiddleware({ resource: 'stats' }), // Invalidate stats after delete
+  invalidateCacheMiddleware({ resource: 'feedback' }), // Invalidate feedback list cache
   feedbackController.deleteFeedback
 );
 

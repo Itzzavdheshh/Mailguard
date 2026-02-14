@@ -461,7 +461,7 @@ class ModelRetrainer:
             print("\nModel files ready for deployment:")
             print(f"  - {self.vectorizer_path}")
             print(f"  - {self.model_path}")
-            print(f"  - {metadata_path}")
+            print(f"  - {self.metadata_path}")
             
             return True
             

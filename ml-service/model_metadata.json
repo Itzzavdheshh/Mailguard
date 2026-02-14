@@ -1,12 +1,12 @@
 {
-  "version": "20260214_180939",
-  "trained_at": "2026-02-14T18:09:39.362113",
+  "version": "20260215_005205",
+  "trained_at": "2026-02-15T00:52:05.450911",
   "model_type": "random_forest",
-  "training_samples": 72,
-  "test_samples": 18,
-  "vocabulary_size": 5000,
-  "accuracy": 0.7777777777777778,
-  "precision": 0.8571428571428571,
-  "recall": 0.6666666666666666,
-  "f1_score": 0.75
+  "training_samples": 34,
+  "test_samples": 9,
+  "vocabulary_size": 3713,
+  "accuracy": 0.6666666666666666,
+  "precision": 0.5,
+  "recall": 1.0,
+  "f1_score": 0.6666666666666666
 }

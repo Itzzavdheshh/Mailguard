@@ -33,17 +33,7 @@ export default defineConfig({
   build: {
     // Production build optimizations
     target: 'es2020',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,  // Remove console.log in production
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
-      },
-      format: {
-        comments: false,  // Remove comments
-      },
-    },
+    minify: 'esbuild',
     // Chunk splitting for better caching
     rollupOptions: {
       output: {

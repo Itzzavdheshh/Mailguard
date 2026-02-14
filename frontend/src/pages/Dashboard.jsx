@@ -109,7 +109,7 @@ function Dashboard() {
     dateTo: '',
     query: '',
     fetchAll: false,
-    timeRange: '5m' // NEW: Default to last 5 minutes for real-time
+    timeRange: '7d' // Default to last 7 days for better results
   })
   const [showFetchOptions, setShowFetchOptions] = useState(false)
 

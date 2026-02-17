@@ -156,3 +156,8 @@ credentials.yml
 credentials.json
 token.json
 .credentials/
+
+# ================================
+# NESTED DIRECTORIES (duplicates)
+# ================================
+Mailguard/Mailguard/

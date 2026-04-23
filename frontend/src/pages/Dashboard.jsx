@@ -129,6 +129,16 @@ function Dashboard() {
     variant: 'destructive' // or 'default'
   })
 
+  const openConfirmDialog = ({ title, description, onConfirm, variant = 'destructive' }) => {
+    setConfirmDialog({
+      open: true,
+      title,
+      description,
+      onConfirm,
+      variant
+    })
+  }
+
   // Fetch stats and emails on component mount
   useEffect(() => {
     fetchStats()
@@ -253,58 +263,62 @@ function Dashboard() {
       return
     }
 
-    if (!window.confirm(`Retrain the AI model with ${feedbackStats.count} feedback entries?\n\nThis may take a few minutes.`)) {
-      return
-    }
-
-    try {
-      setRetraining(true)
-      toast.info('Starting model retraining... This may take 2-5 minutes.')
-      
-      const response = await triggerRetrain()
-      
-      console.log('✅ Retrain complete:', response)
-      toast.success('AI model retrained successfully! The model will now be more accurate.')
-      
-      // Optionally refresh stats
-      await fetchFeedbackStats()
-    } catch (err) {
-      console.error('❌ Failed to retrain model:', err)
-      const errorMsg = err.response?.data?.error || err.message || 'Failed to retrain model'
-      toast.error(errorMsg)
-    } finally {
-      setRetraining(false)
-    }
+    openConfirmDialog({
+      title: 'Retrain AI Model',
+      description: `Retrain the AI model with ${feedbackStats.count} feedback entries? This may take a few minutes.`,
+      variant: 'default',
+      onConfirm: async () => {
+        try {
+          setRetraining(true)
+          toast.info('Starting model retraining... This may take 2-5 minutes.')
+          
+          const response = await triggerRetrain()
+          
+          console.log('✅ Retrain complete:', response)
+          toast.success('AI model retrained successfully! The model will now be more accurate.')
+          
+          // Optionally refresh stats
+          await fetchFeedbackStats()
+        } catch (err) {
+          console.error('❌ Failed to retrain model:', err)
+          const errorMsg = err.response?.data?.error || err.message || 'Failed to retrain model'
+          toast.error(errorMsg)
+        } finally {
+          setRetraining(false)
+        }
+      }
+    })
   }
 
   const handleMigrateEmails = async () => {
-    if (!window.confirm('This will update all existing emails to belong to your account. Continue?')) {
-      return
-    }
-
-    try {
-      setMigrating(true)
-      const response = await migrateEmails()
-      
-      console.log('✅ Migration complete:', response)
-      toast.success(`Successfully migrated ${response.updated} emails to your account!`)
-      
-      // Refresh everything
-      setMigrationNeeded(false)
-      await fetchStats()
-      await fetchEmails()
-    } catch (err) {
-      console.error('❌ Migration failed:', err)
-      toast.error('Failed to migrate emails. Please try again.')
-    } finally {
-      setMigrating(false)
-    }
+    openConfirmDialog({
+      title: 'Migrate Emails',
+      description: 'This will update all existing emails to belong to your account. Continue?',
+      onConfirm: async () => {
+        try {
+          setMigrating(true)
+          const response = await migrateEmails()
+          
+          console.log('✅ Migration complete:', response)
+          toast.success(`Successfully migrated ${response.updated} emails to your account!`)
+          
+          // Refresh everything
+          setMigrationNeeded(false)
+          await fetchStats()
+          await fetchEmails()
+        } catch (err) {
+          console.error('❌ Migration failed:', err)
+          toast.error('Failed to migrate emails. Please try again.')
+        } finally {
+          setMigrating(false)
+        }
+      }
+    })
   }
 
   const handleDelete = async (emailId) => {
     // Show confirmation dialog
-    setConfirmDialog({
-      open: true,
+    openConfirmDialog({
       title: 'Delete Email',
       description: 'Are you sure you want to delete this email? This action cannot be undone.',
       variant: 'destructive',
@@ -382,10 +396,13 @@ function Dashboard() {
       
       // Handle specific error types
       if (err.response?.status === 403) {
-        const shouldMigrate = window.confirm('⚠️ MIGRATION NEEDED!\n\nThis email belongs to your old account. Click OK to automatically migrate ALL emails to your current account.\n\nThis will fix the feedback errors for all emails.')
-        if (shouldMigrate) {
-          handleMigrateEmails()
-        }
+        openConfirmDialog({
+          title: 'Migration Needed',
+          description: 'This email belongs to your old account. Continue to automatically migrate ALL emails to your current account? This will fix the feedback errors for all emails.',
+          onConfirm: async () => {
+            await handleMigrateEmails()
+          }
+        })
       } else if (err.response?.status === 400) {
         toast.error(err.response?.data?.error || 'Invalid feedback data')
       } else {
@@ -427,8 +444,7 @@ function Dashboard() {
     }
     
     // Show confirmation dialog
-    setConfirmDialog({
-      open: true,
+    openConfirmDialog({
       title: 'Delete Multiple Emails',
       description: `Are you sure you want to delete ${selectedEmails.length} email(s)? This action cannot be undone.`,
       variant: 'destructive',
@@ -463,8 +479,7 @@ function Dashboard() {
   // Handle clean all phishing emails
   const handleCleanPhishing = async () => {
     // Show confirmation dialog
-    setConfirmDialog({
-      open: true,
+    openConfirmDialog({
       title: 'Delete All Phishing Emails',
       description: 'Are you sure you want to delete ALL phishing emails? This will permanently remove all detected phishing emails from your inbox.',
       variant: 'destructive',
@@ -488,15 +503,16 @@ function Dashboard() {
           if (result.results.deleted > 0) {
             toast.success(`Successfully cleaned ${result.results.deleted} phishing email(s)! Storage saved: ${result.results.storageSaved.mb} MB`)
             
-            const shouldFetchMore = window.confirm(
-              `Would you like to fetch more emails from Gmail to replace the deleted ones?`
-            )
-            
-            if (shouldFetchMore) {
-              // Auto-fetch more emails (skip confirmation since user already confirmed)
-              await handleFetchEmails(true)
-              return // handleFetchEmails already refreshes
-            }
+            openConfirmDialog({
+              title: 'Fetch More Emails',
+              description: 'Would you like to fetch more emails from Gmail to replace the deleted ones?',
+              variant: 'default',
+              onConfirm: async () => {
+                // Auto-fetch more emails (skip confirmation since user already confirmed)
+                await handleFetchEmails(true)
+              }
+            })
+            return
           } else {
             toast.info('No phishing emails found to clean.')
           }
@@ -513,16 +529,20 @@ function Dashboard() {
   }
 
   const handleLogout = async () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      await signOut()
-    }
+    openConfirmDialog({
+      title: 'Sign Out',
+      description: 'Are you sure you want to logout?',
+      variant: 'default',
+      onConfirm: async () => {
+        await signOut()
+      }
+    })
   }
   
   // Handle clearing all emails from database
   const handleClearAllEmails = () => {
-    setConfirmDialog({
-      open: true,
-      title: '⚠️ Clear All Emails',
+    openConfirmDialog({
+      title: 'Clear All Emails',
       description: 'This will permanently delete ALL emails from the database (not from Gmail). This action cannot be undone. Are you sure?',
       variant: 'destructive',
       onConfirm: async () => {
@@ -559,52 +579,68 @@ function Dashboard() {
   
   // Handle fetching emails from Gmail
   const handleFetchEmails = async (skipConfirm = false) => {
-    if (!skipConfirm && !showFetchOptions && !window.confirm('Fetch latest emails from Gmail and scan for phishing?')) {
+    const runFetchEmails = async () => {
+      try {
+        setFetchingEmails(true)
+        
+        // Step 1: Fetch emails from Gmail with user options
+        const fetchResponse = await fetchGmailEmails(gmailFetchOptions)
+        console.log('✅ Emails fetched:', fetchResponse)
+        
+        // Step 2: Classify the emails
+        console.log('🤖 Classifying emails...')
+        const classifyResponse = await classifyEmails()
+        console.log('✅ Emails classified:', classifyResponse)
+        
+        const message = `Fetched ${fetchResponse.data.fetched} emails (${fetchResponse.data.saved} new)! Classified: ${classifyResponse.stats.processed} emails - Phishing: ${classifyResponse.stats.phishing} | Safe: ${classifyResponse.stats.safe}`
+        
+        if (!skipConfirm) {
+          toast.success(message, { duration: 5000 })
+        }
+        
+        // Refresh emails and stats
+        fetchEmails()
+        fetchStats()
+        setShowFetchOptions(false) // Close options dialog
+        
+        // Auto-refetch if we got all new emails (means there might be more)
+        if (fetchResponse.data.shouldRefetch && fetchResponse.data.saved === fetchResponse.data.fetched) {
+          openConfirmDialog({
+            title: 'Fetch More Emails',
+            description: 'All fetched emails were new. Would you like to fetch more?',
+            variant: 'default',
+            onConfirm: async () => {
+              await handleFetchEmails(true)
+            }
+          })
+        }
+      } catch (err) {
+        console.error('❌ Failed to fetch emails:', err)
+        
+        // Check if Gmail not connected
+        if (err.response?.status === 400) {
+          toast.error('Gmail not connected. Please connect your Gmail account first.')
+        } else {
+          toast.error('Failed to fetch emails. Please try again.')
+        }
+      } finally {
+        setFetchingEmails(false)
+      }
+    }
+
+    if (!skipConfirm && !showFetchOptions) {
+      openConfirmDialog({
+        title: 'Fetch & Scan Emails',
+        description: 'Fetch latest emails from Gmail and scan for phishing?',
+        variant: 'default',
+        onConfirm: async () => {
+          await runFetchEmails()
+        }
+      })
       return
     }
-    
-    try {
-      setFetchingEmails(true)
-      
-      // Step 1: Fetch emails from Gmail with user options
-      const fetchResponse = await fetchGmailEmails(gmailFetchOptions)
-      console.log('✅ Emails fetched:', fetchResponse)
-      
-      // Step 2: Classify the emails
-      console.log('🤖 Classifying emails...')
-      const classifyResponse = await classifyEmails()
-      console.log('✅ Emails classified:', classifyResponse)
-      
-      const message = `Fetched ${fetchResponse.data.fetched} emails (${fetchResponse.data.saved} new)! Classified: ${classifyResponse.stats.processed} emails - Phishing: ${classifyResponse.stats.phishing} | Safe: ${classifyResponse.stats.safe}`
-      
-      if (!skipConfirm) {
-        toast.success(message, { duration: 5000 })
-      }
-      
-      // Refresh emails and stats
-      fetchEmails()
-      fetchStats()
-      setShowFetchOptions(false) // Close options dialog
-      
-      // Auto-refetch if we got all new emails (means there might be more)
-      if (fetchResponse.data.shouldRefetch && fetchResponse.data.saved === fetchResponse.data.fetched) {
-        const fetchMore = window.confirm('All fetched emails were new! Would you like to fetch more?')
-        if (fetchMore) {
-          await handleFetchEmails(true) // Skip confirmation for auto-refetch
-        }
-      }
-    } catch (err) {
-      console.error('❌ Failed to fetch emails:', err)
-      
-      // Check if Gmail not connected
-      if (err.response?.status === 400) {
-        toast.error('Gmail not connected. Please connect your Gmail account first.')
-      } else {
-        toast.error('Failed to fetch emails. Please try again.')
-      }
-    } finally {
-      setFetchingEmails(false)
-    }
+
+    await runFetchEmails()
   }
 
   return (

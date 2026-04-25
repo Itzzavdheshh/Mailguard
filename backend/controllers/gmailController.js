@@ -4,6 +4,7 @@ const Email = require('../models/Email');
 const OAuthState = require('../models/OAuthState');
 const { getAuthUrl, getTokensFromCode } = require('../config/googleOAuth');
 const { fetchEmails } = require('../services/gmailService');
+const { encryptIfNeeded } = require('../utils/encryption');
 
 // ─── HMAC secret validation ───────────────────────────────────────────────────
 const HMAC_SECRET = process.env.ENCRYPTION_KEY || process.env.SESSION_SECRET;
@@ -186,7 +187,7 @@ const handleGmailCallback = async (req, res) => {
     // 6. Persist tokens — use findByIdAndUpdate to avoid triggering unrelated pre-save hooks
     await User.findByIdAndUpdate(userId, {
       gmailAccessToken: tokens.access_token,
-      gmailRefreshToken: tokens.refresh_token,
+      gmailRefreshToken: encryptIfNeeded(tokens.refresh_token),
       gmailConnectedAt: new Date(),
     });
 

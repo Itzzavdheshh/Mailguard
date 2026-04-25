@@ -80,6 +80,8 @@ function Dashboard() {
 
   // Migration state
   const [migrationNeeded, setMigrationNeeded] = useState(false)
+  const [migrationCount, setMigrationCount] = useState(0)
+  const [migrationLoading, setMigrationLoading] = useState(true)
   const [migrating, setMigrating] = useState(false)
 
   // Filter and pagination state
@@ -231,16 +233,19 @@ const response = await fetch(`${API_BASE}/gmail/status`, {
 
   const checkMigrationStatus = async () => {
     try {
+      setMigrationLoading(true)
       const response = await getMigrationStatus()
-      setMigrationNeeded(response.needsMigration || false)
+      setMigrationNeeded(response.needsMigration === true)
       
       if (response.needsMigration) {
-        console.log('⚠️ Migration needed:', response.emailCounts.otherUsers, 'emails')
+        setMigrationCount(response.emailCounts?.otherUsers || 0)
+        console.log('⚠️ Migration needed:', response.emailCounts?.otherUsers, 'emails')
       }
-      setMigrationNeeded(false)
-      // Don't show toast for this - it's checked on load and shouldn't be intrusive
     } catch (err) {
       console.error('❌ Failed to check migration status:', err)
+      toast.error('Failed to check account migration status.')
+    } finally {
+      setMigrationLoading(false)
     }
   }
 
@@ -306,6 +311,7 @@ const response = await fetch(`${API_BASE}/gmail/status`, {
           
           // Refresh everything
           setMigrationNeeded(false)
+          setMigrationCount(0)
           await fetchStats()
           await fetchEmails()
         } catch (err) {
@@ -648,11 +654,24 @@ const response = await fetch(`${API_BASE}/gmail/status`, {
   return (
     <div className="space-y-6">
       {/* Migration Warning Banner */}
-      {migrationNeeded && (
-        <div className="bg-yellow-50 rounded-xl border border-yellow-200 p-6">
+      {migrationLoading ? (
+        <div className="bg-gray-50 rounded-xl border border-gray-200 p-6 animate-pulse">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="p-3 bg-yellow-100 rounded-lg">
+              <div className="w-12 h-12 bg-gray-200 rounded-lg"></div>
+              <div className="space-y-2">
+                <div className="h-5 bg-gray-200 rounded w-48"></div>
+                <div className="h-4 bg-gray-200 rounded w-96"></div>
+              </div>
+            </div>
+            <div className="w-28 h-12 bg-gray-200 rounded-lg"></div>
+          </div>
+        </div>
+      ) : migrationNeeded && (
+        <div className="bg-yellow-50 rounded-xl border border-yellow-200 p-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-yellow-100 rounded-lg flex-shrink-0">
                 <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
@@ -660,36 +679,53 @@ const response = await fetch(`${API_BASE}/gmail/status`, {
               <div>
                 <h3 className="text-lg font-semibold text-yellow-900 mb-1">⚠️ Email Migration Required</h3>
                 <p className="text-sm text-yellow-700">
-                  Your existing emails need to be migrated to your new Clerk account. Click "Fix Now" to update ownership.
+                  {migrationCount > 0 ? `You have ${migrationCount} existing email(s) that need ` : 'Your existing emails need '}
+                  to be migrated to your new Clerk account. Click "Fix Now" to update ownership.
                 </p>
               </div>
             </div>
-            <button
-              onClick={handleMigrateEmails}
-              disabled={migrating}
-              className={`px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center space-x-2 ${
-                migrating
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-yellow-600 hover:bg-yellow-700 text-white'
-              }`}
-            >
-              {migrating ? (
-                <>
-                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>Migrating...</span>
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Fix Now</span>
-                </>
-              )}
-            </button>
+            <div className="flex space-x-3 w-full sm:w-auto">
+              <button
+                onClick={checkMigrationStatus}
+                disabled={migrating}
+                title="Retry check"
+                className={`px-4 py-3 rounded-lg font-semibold transition duration-200 flex items-center justify-center space-x-2 ${
+                  migrating
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-300'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+              <button
+                onClick={handleMigrateEmails}
+                disabled={migrating}
+                className={`flex-1 sm:flex-none px-6 py-3 rounded-lg font-semibold transition duration-200 flex items-center justify-center space-x-2 ${
+                  migrating
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-yellow-600 hover:bg-yellow-700 text-white shadow-md'
+                }`}
+              >
+                {migrating ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Migrating...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Fix Now</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
